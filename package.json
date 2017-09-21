@@ -1,0 +1,17 @@
+{
+  "name": "heuristica",
+  "version": "1.0.0",
+  "description": "Aula da adriana",
+  "main": "index.js",
+  "author": "Andre Farzat",
+  "license": "MIT",
+  "scripts": {
+    "vai": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "ts-loader": "^2.3.7",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.2",
+    "webpack": "^3.6.0"
+  }
+}
