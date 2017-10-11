@@ -1,52 +1,13 @@
-import Func from "./nodes/Func";
-import Individual from "./Individual";
-import Utils from "./Utils";
+import Program from "./Program";
 
 
-class Program {
-    public left: string[] = [];
-    public right: string[] = [];
-    public chars: {[key: string]: number} = {};
-
-    public get validChars(): string[] {
-        return Object.keys(this.chars);
-    }
-
-    constructor(public instanceName: string) {
-        let instance = Utils.loadInstance(instanceName);
-        this.left = instance.left;
-        this.right = instance.right;
-    }
-
-    public init(): void {
-        this.extractUniqueChars(this.left);
-    }
-
-    public extractUniqueChars(text: string[]): void {
-        this.left.forEach(name => {
-            name.split('').forEach(letter => {
-                if (!(letter in this.chars)) {
-                    this.chars[letter] = 0;
-                }
-                this.chars[letter] += 1;
-            });
-        });
-    }
-
-    public isValidLeftSolution(regex: RegExp): boolean {
-        return this.left.every(name => regex.test(name));
-    }
-}
-
-
-console.log(__dirname);
-const program = new Program('family');
+const program = new Program('books');
 program.init();
 
+var ind = program.generateInitialIndividual();
 
-console.log('sim');
 
-
+console.log(ind.toString());
 
 
 

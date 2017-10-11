@@ -1,6 +1,7 @@
 
 export default interface Node {
     // mutate(): void;
-    // toString(): string;
+    toString(): string;
+    toRegex(): RegExp;
 }
 

@@ -5,8 +5,7 @@
         "noImplicitAny": true,
         "module": "commonjs",
         "target": "es6",
-        "jsx": "react",
-        "lib": ["es6", "es2015.promise", "dom"]
+        "lib": ["es6"]
     },
     "files": [
         "./src/index.ts"
