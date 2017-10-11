@@ -4,8 +4,8 @@ import * as path from "path";
 
 export default class Utils {
     static loadInstance(instanceName: string): {left: string[], right: string[]} {
-        let pathToLeftFile  = path.join(__dirname, 'instances', instanceName, 'left.txt');
-        let pathToRightFile = path.join(__dirname, 'instances', instanceName, 'right.txt');
+        let pathToLeftFile  = path.join(__dirname, '..', 'instances', instanceName, 'left.txt');
+        let pathToRightFile = path.join(__dirname, '..', 'instances', instanceName, 'right.txt');
 
         return {
             left: Utils.getTxtFileAsArray(pathToLeftFile),

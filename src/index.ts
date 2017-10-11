@@ -4,9 +4,13 @@ import Utils from "./Utils";
 
 
 class Program {
-    public validChars: string[] = [];
     public left: string[] = [];
     public right: string[] = [];
+    public chars: {[key: string]: number} = {};
+
+    public get validChars(): string[] {
+        return Object.keys(this.chars);
+    }
 
     constructor(public instanceName: string) {
         let instance = Utils.loadInstance(instanceName);
@@ -15,16 +19,18 @@ class Program {
     }
 
     public init(): void {
-        this.validChars = this.extractUniqueChars(this.left);
+        this.extractUniqueChars(this.left);
     }
 
-    public extractUniqueChars(text: string[]): string[] {
-        let letters = new Set();
-        this.left.forEach(name => name.split('').forEach(letter => letters.add(letter)));
-
-        let chars: string[] = [];
-        letters.forEach(letter => chars.push(letter));
-        return chars;
+    public extractUniqueChars(text: string[]): void {
+        this.left.forEach(name => {
+            name.split('').forEach(letter => {
+                if (!(letter in this.chars)) {
+                    this.chars[letter] = 0;
+                }
+                this.chars[letter] += 1;
+            });
+        });
     }
 
     public isValidLeftSolution(regex: RegExp): boolean {
@@ -33,11 +39,12 @@ class Program {
 }
 
 
-
+console.log(__dirname);
 const program = new Program('family');
 program.init();
 
 
+console.log('sim');
 
 
 
