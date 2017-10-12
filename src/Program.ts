@@ -37,8 +37,17 @@ export default class Program {
         this.chars = Utils.sortObjectByValue(this.chars);
     }
 
-    public isValidLeftSolution(ind: Individual): boolean {
+    public isValidLeft(ind: Individual): boolean {
         return this.left.every(name => ind.test(name));
+    }
+
+    public evaluate(ind: Individual): void {
+        let regex = ind.toRegex();
+        let fitness = 0;
+
+        this.left.forEach(name => fitness += regex.test(name) ? 1 : 0);
+        this.right.forEach(name => fitness -= regex.test(name) ? 1 : 0);
+        ind.fitness = fitness;
     }
 
     public generateInitialIndividual(): Individual {
@@ -51,12 +60,12 @@ export default class Program {
         ind.tree.left = new Terminal(this.validChars[index]);
         ind.tree.right = new Terminal('');
 
-        if (this.isValidLeftSolution(ind)) {
+        if (this.isValidLeft(ind)) {
             return ind;
         }
 
         let current = ind.tree;
-        while (!this.isValidLeftSolution(ind)) {
+        while (!this.isValidLeft(ind)) {
             current.type = Func.Types.or;
             index ++;
 
@@ -74,5 +83,13 @@ export default class Program {
         }
 
         return ind;
+    }
+
+    public * generateNeighbors(ind: Individual) {
+        let ret: string[] = [];
+
+        let options = ['^', '$'];
+
+        yield* options;
     }
 }

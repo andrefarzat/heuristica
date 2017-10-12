@@ -32,4 +32,10 @@ export default class Utils {
         });
         return newObj;
     }
+
+    static getRandomlyFromList<T>(list: T[]) {
+        let len = list.length;
+        let index = Utils.nextInt(len);
+        return list[index];
+    }
 }

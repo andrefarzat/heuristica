@@ -1,12 +1,10 @@
 import Program from "./Program";
 
 
-const program = new Program('hard');
+const program = new Program('family');
 program.init();
 
 var ind = program.generateInitialIndividual();
-
-
 console.log(ind.toString());
 
 
