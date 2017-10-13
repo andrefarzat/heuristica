@@ -7,10 +7,19 @@ import Utils from "./Utils";
 export default class Program {
     public left: string[] = [];
     public right: string[] = [];
-    public chars: {[key: string]: number} = {};
+    public chars: {left: {[key: string]: number}, right: {[key: string]: number}} = {left: {}, right: {}};
+    public neighborhoodSize = 25;
 
-    public get validChars(): string[] {
-        return Object.keys(this.chars);
+    public get validLeftChars(): string[] {
+        return Object.keys(this.chars.left);
+    }
+
+    public get validRigthChars(): string[] {
+        return Object.keys(this.chars.right);
+    }
+
+    public getCharsInRightNotInLeft(): string[] {
+        return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
     }
 
     constructor(public instanceName: string) {
@@ -20,25 +29,35 @@ export default class Program {
     }
 
     public init(): void {
-        this.extractUniqueChars(this.left);
+        this.chars.left = this.extractUniqueChars(this.left);
+        this.chars.right = this.extractUniqueChars(this.right);
     }
 
-    public extractUniqueChars(text: string[]): void {
-        this.left.forEach(name => {
+    public extractUniqueChars(text: string[]): {[key: string]: number} {
+        let chars: {[key: string]: number} = {};
+        text.forEach(name => {
             let uniqueChars = new Set();
             name.split('').forEach(letter => uniqueChars.add(letter));
 
             uniqueChars.forEach(char => {
-                if(!(char in this.chars)) this.chars[char] = 0;
-                this.chars[char] += 1;
+                if(!(char in chars)) chars[char] = 0;
+                chars[char] += 1;
             });
         });
 
-        this.chars = Utils.sortObjectByValue(this.chars);
+        return Utils.sortObjectByValue(chars);
     }
 
     public isValidLeft(ind: Individual): boolean {
         return this.left.every(name => ind.test(name));
+    }
+
+    public isValid(ind: Individual): boolean {
+        if (ind.fitness === undefined) {
+            this.evaluate(ind);
+        }
+
+        return ind.fitness == this.left.length;
     }
 
     public evaluate(ind: Individual): void {
@@ -52,12 +71,12 @@ export default class Program {
 
     public generateInitialIndividual(): Individual {
         let index = 0;
-        let maxIndex = this.validChars.length - 1;
+        let maxIndex = this.validLeftChars.length - 1;
 
         let ind = new Individual();
         ind.tree = new Func();
         ind.tree.type = Func.Types.concatenation;
-        ind.tree.left = new Terminal(this.validChars[index]);
+        ind.tree.left = new Terminal(this.validLeftChars[index]);
         ind.tree.right = new Terminal('');
 
         if (this.isValidLeft(ind)) {
@@ -75,8 +94,8 @@ export default class Program {
 
             let func = new Func();
             func.type = Func.Types.or;
-            func.left = new Terminal(this.validChars[index]);
-            func.right = new Terminal(this.validChars[index + 1]);
+            func.left = new Terminal(this.validLeftChars[index]);
+            func.right = new Terminal(this.validLeftChars[index + 1]);
 
             current.right = func;
             current = func;
@@ -85,11 +104,27 @@ export default class Program {
         return ind;
     }
 
-    public * generateNeighbors(ind: Individual) {
-        let ret: string[] = [];
+    public * generateNeighborhood(ind: Individual) {
+        let newInd = ind.clone();
+        newInd.tree.type = Func.Types.lineBegin;
+        yield newInd;
 
-        let options = ['^', '$'];
+        newInd = ind.clone();
+        newInd.tree.type = Func.Types.lineEnd;
+        yield newInd;
 
-        yield* options;
+        let chars = this.getCharsInRightNotInLeft();
+        for (let i = 0; i < chars.length; i++) {
+            newInd = ind.clone();
+            let leaf = newInd.tree.getLeastFunc();
+
+            let func = new Func();
+            func.type = Func.Types.or;
+            func.left = leaf.right;
+            func.right = new Terminal(chars[i]);
+
+            leaf.right = func;
+            yield newInd;
+        }
     }
 }

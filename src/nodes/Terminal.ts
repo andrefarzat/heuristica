@@ -18,4 +18,10 @@ export default class Terminal implements Node {
     public toRegex(): RegExp {
         return new RegExp(this.toString());
     }
+
+    public clone(): Terminal {
+        let terminal = new Terminal();
+        terminal.value = this.value;
+        return terminal;
+    }
 }

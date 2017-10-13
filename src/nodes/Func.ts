@@ -1,4 +1,5 @@
 import Node from "./Node";
+import Terminal from "./Terminal";
 import Utils from "../Utils";
 
 
@@ -48,5 +49,34 @@ export default class Func implements Node {
 
     public toRegex(): RegExp {
         return new RegExp(this.toString());
+    }
+
+    public clone(): Func {
+        let func = new Func();
+        func.left = this.left.clone();
+        func.right = this.right.clone();
+        func.type = this.type;
+        return func;
+    }
+
+    public getLeastTerminal(): Terminal {
+        let current: Node = this.right;
+        while (current instanceof Func) {
+            current = current.right;
+        }
+        return current as Terminal;
+    }
+
+    public getLeastFunc(): Func {
+        if (this.right instanceof Terminal) {
+            return this;
+        }
+
+        let current: Func = this.right as Func;
+        while (!(current.right instanceof Terminal)) {
+            current = current.right as Func;
+        }
+
+        return current;
     }
 }

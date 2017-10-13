@@ -6,7 +6,7 @@ export default class Individual {
     public fitness: number;
 
     public toString(): string {
-        return `[Individual] ${this.tree.toString()}`;
+        return `[Individual] /${this.tree.toString()}/`;
     }
 
     public toRegex(): RegExp {
@@ -15,5 +15,12 @@ export default class Individual {
 
     public test(name: string): boolean {
         return this.tree.toRegex().test(name);
+    }
+
+    public clone(): Individual {
+        let ind = new Individual();
+        ind.tree = this.tree.clone();
+        ind.fitness = this.fitness;
+        return ind;
     }
 }
