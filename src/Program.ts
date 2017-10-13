@@ -53,11 +53,8 @@ export default class Program {
     }
 
     public isValid(ind: Individual): boolean {
-        if (ind.fitness === undefined) {
-            this.evaluate(ind);
-        }
-
-        return ind.fitness == this.left.length;
+        this.evaluate(ind);
+        return ind.fitness >= this.left.length;
     }
 
     public evaluate(ind: Individual): void {
@@ -119,7 +116,7 @@ export default class Program {
             let leaf = newInd.tree.getLeastFunc();
 
             let func = new Func();
-            func.type = Func.Types.or;
+            func.type = (leaf.type == Func.Types.negation) ? Func.Types.concatenation : Func.Types.negation;
             func.left = leaf.right;
             func.right = new Terminal(chars[i]);
 

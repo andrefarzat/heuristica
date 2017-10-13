@@ -21,11 +21,14 @@ do {
 
         if(neighbor.fitness > ind.fitness) {
             ind = neighbor;
+        } else if (neighbor.fitness == ind.fitness) {
+            // tiebreaker
+            if (neighbor.tree.toString().length < ind.tree.toString().length) {
+                ind = neighbor;
+            }
         }
     }
 
 } while (true);
-
-
 
 console.log('Solution', ind.toString());
