@@ -22,6 +22,10 @@ export default class Program {
         return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
     }
 
+    public getCharsInLeftNotInRight(): string[] {
+        return this.validLeftChars.filter(char => this.validRigthChars.indexOf(char) === -1);
+    }
+
     constructor(public instanceName: string) {
         let instance = Utils.loadInstance(instanceName);
         this.left = instance.left;
@@ -110,18 +114,80 @@ export default class Program {
         newInd.tree.type = Func.Types.lineEnd;
         yield newInd;
 
-        let chars = this.getCharsInRightNotInLeft();
+        let chars = this.getCharsInLeftNotInRight();
         for (let i = 0; i < chars.length; i++) {
             newInd = ind.clone();
             let leaf = newInd.tree.getLeastFunc();
 
             let func = new Func();
-            func.type = (leaf.type == Func.Types.negation) ? Func.Types.concatenation : Func.Types.negation;
+            func.type = Func.Types.concatenation;
             func.left = leaf.right;
             func.right = new Terminal(chars[i]);
-
-            leaf.right = func;
             yield newInd;
+        }
+
+        for (let i = 0; i < chars.length; i++) {
+            newInd = ind.clone();
+            let leaf = newInd.tree;
+
+            let func = new Func();
+            func.type = Func.Types.concatenation;
+            func.right = leaf;
+            func.left = new Terminal(chars[i]);
+            newInd.tree = func;
+            yield newInd;
+        }
+    }
+
+    public getRandomNeighbor(ind: Individual, chars: string[]): Individual {
+        let aleatoryNumber = Utils.nextInt(4);
+        let char = new Terminal(Utils.getRandomlyFromList(chars));
+
+        if (aleatoryNumber == 0) {
+            // Append at end
+            let newInd = ind.clone();
+            let leaf = newInd.tree.getLeastFunc();
+            let func = new Func();
+            func.type = Func.Types.concatenation;
+            func.left = leaf.right;
+            func.right = char;
+            return newInd;
+        } else if (aleatoryNumber == 1) {
+            // Append at beginning
+            let newInd = ind.clone();
+            let func = new Func();
+            func.type = Func.Types.concatenation;
+            func.left = char;
+            func.right = newInd.tree;
+            newInd.tree = func;
+            return newInd;
+        } else if (aleatoryNumber == 2) {
+            // Insert into index
+            let newInd = ind.clone();
+            let currentFunc = Utils.getRandomlyFromList(newInd.tree.getFuncs());
+            let func = new Func();
+            func.type = Func.Types.concatenation;
+            func.left = char;
+            func.right = currentFunc;
+
+            let parent = newInd.getParentOf(currentFunc);
+            if (parent) {
+                if (parent.side == 'left') parent.func.left = func;
+                else parent.func.right = func;
+            }
+
+            return newInd;
+        } else {
+            // Swap at index
+            let newInd = ind.clone();
+            let currentTerminal = Utils.getRandomlyFromList(newInd.tree.getTerminals());
+            let parent = newInd.getParentOf(currentTerminal);
+            if (parent) {
+                if (parent.side === 'left') parent.func.left = char;
+                else parent.func.right = char;
+            }
+
+            return newInd;
         }
     }
 }

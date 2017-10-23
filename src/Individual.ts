@@ -1,4 +1,5 @@
 import Func from "./nodes/Func";
+import Node from "./nodes/Node";
 
 
 export default class Individual {
@@ -22,5 +23,17 @@ export default class Individual {
         ind.tree = this.tree.clone();
         ind.fitness = this.fitness;
         return ind;
+    }
+
+    public getParentOf(node: Node): {func: Func, side: 'left' | 'right'} {
+        let funcs = this.tree.getFuncs();
+
+        for(let i = 0; i < funcs.length; i ++) {
+            let current = funcs[i];
+            if (current.left  === node) return {func: current, side: 'left'};
+            if (current.right === node) return {func: current, side: 'right'};
+        }
+
+        return null;
     }
 }

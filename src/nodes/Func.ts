@@ -79,4 +79,32 @@ export default class Func implements Node {
 
         return current;
     }
+
+    public getNodes(): Node[] {
+        let nodes: Node[] = [];
+        nodes.push(this);
+        nodes.push(this.left);
+        nodes.push(this.right);
+
+        if (this.left  instanceof Func) nodes = nodes.concat(this.left.getNodes());
+        if (this.right instanceof Func) nodes = nodes.concat(this.right.getNodes());
+
+        return nodes;
+    }
+
+    public getTerminals(): Terminal[] {
+        let nodes: Terminal[] = [];
+        this.getNodes().forEach(node => {
+            if (node instanceof Terminal) nodes.push(node);
+        });
+        return nodes;
+    }
+
+    public getFuncs(): Func[] {
+        let nodes: Func[] = [];
+        this.getNodes().forEach(node => {
+            if (node instanceof Func) nodes.push(node);
+        });
+        return nodes;
+    }
 }

@@ -22,6 +22,10 @@ export default class Utils {
         return Math.round(Math.random() * max);
     }
 
+    static nextBoolean(): boolean {
+        return Utils.nextInt(1) == 0;
+    }
+
     static sortObjectByValue(obj: {[key: string]: number}): {[key: string]: number} {
         let items = Object.keys(obj).map(key => [key, obj[key]]);
         items.sort((first, second) => (<number>second[1]) - (<number>first[1]));
