@@ -1,7 +1,7 @@
 import Program from "./Program";
 
 
-const program = new Program('ranges');
+const program = new Program('movies');
 program.init();
 
 var ind = program.generateInitialIndividual();
