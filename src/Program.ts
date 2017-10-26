@@ -87,8 +87,12 @@ export default class Program {
     }
 
     public evaluateString(str: string): number {
-        let regex = new RegExp(str);
-        return this.evaluateRegex(regex);
+        try {
+            let regex = new RegExp(str);
+            return this.evaluateRegex(regex);
+        } catch(e) {
+            return 0;
+        }
     }
 
     public evaluate(ind: Individual): void {
@@ -135,48 +139,58 @@ export default class Program {
         let len = solution.length;
         let firstLetter = solution.substr(0, 1);
         let lastLetter  = solution.substr(-1);
-        let chars = this.leftCharsNotInRight.concat(['^', '$', '.']);
-        let operators = ["•", "•|•"]
+        let chars = this.validLeftChars.concat(['^', '$', '*']);
 
-        // concatenation = ,
-        // or = ,
-        // lineBegin = "^•",
-        // lineEnd = "•$",
-        // zeroOrMore = "•*+",
-        // oneOrMore = "•?+",
-        // group = "(•)",
-        // negation = "[^•]",
-        // range = "[•]",
-        // more = "•++",
-
-        for(let o = 0; o < operators.length; o++) {
-            let operator = operators[o];
-        }
-
-        // Swapping
+        // Operator: Concatenation
         for(let i = 0; i < len; i++) {
             for(let j = 0; j < chars.length; j++) {
                 let char = chars[j];
                 if (char == '^' && firstLetter == '^') continue;
                 if (char == '$' && lastLetter  == '$') continue;
 
+                // Swapping
                 let currentSolution = solution.split('');
                 currentSolution[i] = char;
                 yield currentSolution.join('');
+
+                // Appending
+                yield solution.substr(0, i) + char + solution.substr(i)
             }
         }
 
-        // Appending
+        // Operator: Or
         for(let i = 0; i <= len; i++) {
             for(let j = 0; j < chars.length; j++) {
                 let char = chars[j];
-                if (char == '^' && firstLetter == '^') continue;
-                if (char == '$' && lastLetter  == '$') continue;
-
-                let currentSolution = solution.substr(0, i) + char + solution.substr(i);
-                yield currentSolution;
+                yield solution.substr(0, i) + '|' + solution.substr(i);
+                yield solution.substr(0, i) + char + '|' + solution.substr(i);
+                yield solution.substr(0, i) + '|' + char + solution.substr(i);
             }
         }
+
+        // Operator: Range
+        let ranges: string[] = [];
+        this.validLeftChars.forEach(c => {
+            this.validLeftChars.forEach(cc => {
+                if (c < cc) ranges.push(`[${c}-${cc}]`)
+            });
+        });
+
+        for(let i = 0; i <= len; i++) {
+            for(let j = 0; j < ranges.length; j++) {
+                let range = ranges[j];
+
+                let currentSolution = solution.split('');
+                currentSolution[i] = range;
+                yield currentSolution.join('');
+                yield solution.substr(0, i) + range + solution.substr(i);
+            }
+        }
+        // zeroOrMore = "•*+",
+        // oneOrMore = "•?+",
+        // group = "(•)",
+        // negation = "[^•]",
+        // more = "•++",
     }
 
     public getRandomNeighbor(ind: Individual): Individual {

@@ -1,13 +1,13 @@
 import Program from "./Program";
 
 
-const program = new Program('books');
+const program = new Program('triples');
 program.init();
 
 var ind = program.generateInitialIndividual();
 let solution = ind.toString();
 let bestFitness = program.evaluateString(solution);
-console.log('Initial: ', ind.toString());
+console.log('Initial: ', solution);
 
 console.log('[leftCharsNotInRight]: ', program.leftCharsNotInRight);
 console.log('[rightCharsNotInLeft]: ', program.rightCharsNotInLeft);
@@ -29,7 +29,7 @@ do {
             hasFoundBetter = true;
             console.log(neighbor.value, fitness, 'o/');
         } else {
-            if (fitness == bestFitness && solution != neighbor.value) {
+            if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.length) {
                 bestNeighbor = neighbor.value;
             }
             console.log(neighbor.value, fitness);
@@ -45,6 +45,7 @@ do {
 
 
 console.log('Solution: ', solution, bestFitness);
+console.log('Max: ', program.left.length + program.right.length);
 
 /*
 
