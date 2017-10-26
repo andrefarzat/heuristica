@@ -7,7 +7,7 @@ export default class Individual {
     public fitness: number;
 
     public toString(): string {
-        return `[Individual] /${this.tree.toString()}/`;
+        return this.tree.toString();
     }
 
     public toRegex(): RegExp {

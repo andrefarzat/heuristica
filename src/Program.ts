@@ -11,10 +11,6 @@ export default class Program {
     public chars: {left: {[key: string]: number}, right: {[key: string]: number}} = {left: {}, right: {}};
     public factory: IndividualFactory;
 
-    public get maxEvaluations(): number {
-        return 50000;
-    }
-
     public get validLeftChars(): string[] {
         return Object.keys(this.chars.left);
     }
@@ -24,11 +20,11 @@ export default class Program {
     }
 
     public get leftCharsNotInRight(): string[] {
-        return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
+        return this.validLeftChars.filter(char => this.validRigthChars.indexOf(char) === -1);
     }
 
     public get rightCharsNotInLeft(): string[] {
-        return this.validLeftChars.filter(char => this.validRigthChars.indexOf(char) === -1);
+        return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
     }
 
     constructor(public instanceName: string) {
@@ -73,13 +69,31 @@ export default class Program {
         return ind.fitness >= quantity;
     }
 
-    public evaluate(ind: Individual): void {
-        let regex = ind.toRegex();
-        let fitness = 0;
+    public isBestRegex(regex: RegExp | string): boolean {
+        if (typeof regex == "string") {
+            regex = new RegExp(regex);
+        }
 
+        let fitness = this.evaluateRegex(regex);
+        let quantity = this.left.length + this.right.length;
+        return fitness >= quantity;
+    }
+
+    public evaluateRegex(regex: RegExp): number {
+        let fitness = 0;
         this.left .forEach(name => fitness += regex.test(name) ? 1 : 0);
         this.right.forEach(name => fitness += regex.test(name) ? 0 : 1);
-        ind.fitness = fitness;
+        return fitness;
+    }
+
+    public evaluateString(str: string): number {
+        let regex = new RegExp(str);
+        return this.evaluateRegex(regex);
+    }
+
+    public evaluate(ind: Individual): void {
+        let regex = ind.toRegex();
+        ind.fitness = this.evaluateRegex(regex);
     }
 
     public generateInitialIndividual(): Individual {
@@ -117,43 +131,51 @@ export default class Program {
         return ind;
     }
 
-    public * generateNeighborhood(ind: Individual) {
-        // Swapping
-        this.leftCharsNotInRight.forEach(char => {
+    public * generateNeighborhood(solution: string) {
+        let len = solution.length;
+        let firstLetter = solution.substr(0, 1);
+        let lastLetter  = solution.substr(-1);
+        let chars = this.leftCharsNotInRight.concat(['^', '$', '.']);
+        let operators = ["•", "•|•"]
 
-        });
-        // Appending
+        // concatenation = ,
+        // or = ,
+        // lineBegin = "^•",
+        // lineEnd = "•$",
+        // zeroOrMore = "•*+",
+        // oneOrMore = "•?+",
+        // group = "(•)",
+        // negation = "[^•]",
+        // range = "[•]",
+        // more = "•++",
 
-        let newInd = ind.clone();
-        newInd.tree.type = Func.Types.lineBegin;
-        yield newInd;
-
-        newInd = ind.clone();
-        newInd.tree.type = Func.Types.lineEnd;
-        yield newInd;
-
-        let chars = this.getCharsInLeftNotInRight();
-        for (let i = 0; i < chars.length; i++) {
-            newInd = ind.clone();
-            let leaf = newInd.tree.getLeastFunc();
-
-            let func = new Func();
-            func.type = Func.Types.concatenation;
-            func.left = leaf.right;
-            func.right = new Terminal(chars[i]);
-            yield newInd;
+        for(let o = 0; o < operators.length; o++) {
+            let operator = operators[o];
         }
 
-        for (let i = 0; i < chars.length; i++) {
-            newInd = ind.clone();
-            let leaf = newInd.tree;
+        // Swapping
+        for(let i = 0; i < len; i++) {
+            for(let j = 0; j < chars.length; j++) {
+                let char = chars[j];
+                if (char == '^' && firstLetter == '^') continue;
+                if (char == '$' && lastLetter  == '$') continue;
 
-            let func = new Func();
-            func.type = Func.Types.concatenation;
-            func.right = leaf;
-            func.left = new Terminal(chars[i]);
-            newInd.tree = func;
-            yield newInd;
+                let currentSolution = solution.split('');
+                currentSolution[i] = char;
+                yield currentSolution.join('');
+            }
+        }
+
+        // Appending
+        for(let i = 0; i <= len; i++) {
+            for(let j = 0; j < chars.length; j++) {
+                let char = chars[j];
+                if (char == '^' && firstLetter == '^') continue;
+                if (char == '$' && lastLetter  == '$') continue;
+
+                let currentSolution = solution.substr(0, i) + char + solution.substr(i);
+                yield currentSolution;
+            }
         }
     }
 
