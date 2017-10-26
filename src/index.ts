@@ -1,7 +1,7 @@
 import Program from "./Program";
 
 
-const program = new Program('triples');
+const program = new Program('ranges');
 program.init();
 
 var ind = program.generateInitialIndividual();
@@ -32,7 +32,7 @@ do {
             if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.length) {
                 bestNeighbor = neighbor.value;
             }
-            console.log(neighbor.value, fitness);
+            // console.log(neighbor.value, fitness);
         }
     } while(true)
 

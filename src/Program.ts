@@ -139,10 +139,10 @@ export default class Program {
         let len = solution.length;
         let firstLetter = solution.substr(0, 1);
         let lastLetter  = solution.substr(-1);
-        let chars = this.validLeftChars.concat(['^', '$', '*']);
+        let chars = this.validLeftChars.concat(['', '^', '$', '*']);
 
         // Operator: Concatenation
-        for(let i = 0; i < len; i++) {
+        for(let i = 0; i <= len; i++) {
             for(let j = 0; j < chars.length; j++) {
                 let char = chars[j];
                 if (char == '^' && firstLetter == '^') continue;
@@ -186,10 +186,18 @@ export default class Program {
                 yield solution.substr(0, i) + range + solution.substr(i);
             }
         }
+
+        // Operator: Negation
+        for(let i = 0; i <= len; i++) {
+            for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
+                let char = '[^'+ this.rightCharsNotInLeft[j] + ']';
+                yield solution.substr(0, i) + char + solution.substr(i);
+            }
+        }
+
         // zeroOrMore = "•*+",
         // oneOrMore = "•?+",
         // group = "(•)",
-        // negation = "[^•]",
         // more = "•++",
     }
 
