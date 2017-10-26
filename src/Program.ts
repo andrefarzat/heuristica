@@ -1,5 +1,6 @@
 import Func from "./nodes/Func";
 import Individual from "./Individual";
+import IndividualFactory from "./IndividualFactory";
 import Terminal from "./nodes/Terminal";
 import Utils from "./Utils";
 
@@ -8,7 +9,11 @@ export default class Program {
     public left: string[] = [];
     public right: string[] = [];
     public chars: {left: {[key: string]: number}, right: {[key: string]: number}} = {left: {}, right: {}};
-    public neighborhoodSize = 25;
+    public factory: IndividualFactory;
+
+    public get maxEvaluations(): number {
+        return 50000;
+    }
 
     public get validLeftChars(): string[] {
         return Object.keys(this.chars.left);
@@ -18,11 +23,11 @@ export default class Program {
         return Object.keys(this.chars.right);
     }
 
-    public getCharsInRightNotInLeft(): string[] {
+    public get leftCharsNotInRight(): string[] {
         return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
     }
 
-    public getCharsInLeftNotInRight(): string[] {
+    public get rightCharsNotInLeft(): string[] {
         return this.validLeftChars.filter(char => this.validRigthChars.indexOf(char) === -1);
     }
 
@@ -35,6 +40,7 @@ export default class Program {
     public init(): void {
         this.chars.left = this.extractUniqueChars(this.left);
         this.chars.right = this.extractUniqueChars(this.right);
+        this.factory = new IndividualFactory(this.validLeftChars, this.validRigthChars);
     }
 
     public extractUniqueChars(text: string[]): {[key: string]: number} {
@@ -61,12 +67,18 @@ export default class Program {
         return ind.fitness >= this.left.length;
     }
 
+    public isBest(ind: Individual): boolean {
+        this.evaluate(ind);
+        let quantity = this.left.length + this.right.length;
+        return ind.fitness >= quantity;
+    }
+
     public evaluate(ind: Individual): void {
         let regex = ind.toRegex();
         let fitness = 0;
 
-        this.left.forEach(name => fitness += regex.test(name) ? 1 : 0);
-        this.right.forEach(name => fitness -= regex.test(name) ? 1 : 0);
+        this.left .forEach(name => fitness += regex.test(name) ? 1 : 0);
+        this.right.forEach(name => fitness += regex.test(name) ? 0 : 1);
         ind.fitness = fitness;
     }
 
@@ -106,6 +118,12 @@ export default class Program {
     }
 
     public * generateNeighborhood(ind: Individual) {
+        // Swapping
+        this.leftCharsNotInRight.forEach(char => {
+
+        });
+        // Appending
+
         let newInd = ind.clone();
         newInd.tree.type = Func.Types.lineBegin;
         yield newInd;
@@ -139,55 +157,7 @@ export default class Program {
         }
     }
 
-    public getRandomNeighbor(ind: Individual, chars: string[]): Individual {
-        let aleatoryNumber = Utils.nextInt(4);
-        let char = new Terminal(Utils.getRandomlyFromList(chars));
-
-        if (aleatoryNumber == 0) {
-            // Append at end
-            let newInd = ind.clone();
-            let leaf = newInd.tree.getLeastFunc();
-            let func = new Func();
-            func.type = Func.Types.concatenation;
-            func.left = leaf.right;
-            func.right = char;
-            return newInd;
-        } else if (aleatoryNumber == 1) {
-            // Append at beginning
-            let newInd = ind.clone();
-            let func = new Func();
-            func.type = Func.Types.concatenation;
-            func.left = char;
-            func.right = newInd.tree;
-            newInd.tree = func;
-            return newInd;
-        } else if (aleatoryNumber == 2) {
-            // Insert into index
-            let newInd = ind.clone();
-            let currentFunc = Utils.getRandomlyFromList(newInd.tree.getFuncs());
-            let func = new Func();
-            func.type = Func.Types.concatenation;
-            func.left = char;
-            func.right = currentFunc;
-
-            let parent = newInd.getParentOf(currentFunc);
-            if (parent) {
-                if (parent.side == 'left') parent.func.left = func;
-                else parent.func.right = func;
-            }
-
-            return newInd;
-        } else {
-            // Swap at index
-            let newInd = ind.clone();
-            let currentTerminal = Utils.getRandomlyFromList(newInd.tree.getTerminals());
-            let parent = newInd.getParentOf(currentTerminal);
-            if (parent) {
-                if (parent.side === 'left') parent.func.left = char;
-                else parent.func.right = char;
-            }
-
-            return newInd;
-        }
+    public getRandomNeighbor(ind: Individual): Individual {
+        return this.factory.generateRandomlyFrom(ind);
     }
 }

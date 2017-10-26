@@ -7,51 +7,24 @@ program.init();
 var ind = program.generateInitialIndividual();
 console.log('Initial', ind.toString());
 
-/*
-do {
-    if (program.isValid(ind)) break;
-
-    var neighborhood = program.generateNeighborhood(ind);
-    while (true) {
-        var item = neighborhood.next();
-        if (item.done) break;
-
-        var neighbor = item.value;
-        program.evaluate(neighbor);
-        console.log('neighbor', neighbor.toString(), neighbor.fitness);
-
-        if(neighbor.fitness > ind.fitness) {
-            ind = neighbor;
-        } else if (neighbor.fitness == ind.fitness) {
-            // tiebreaker
-            if (neighbor.tree.toString().length < ind.tree.toString().length) {
-                ind = neighbor;
-            }
-        }
-    }
-
-} while (true);
-*/
-
+var maxEvaluations = program.maxEvaluations;
 
 do {
-    if (program.isValid(ind)) break;
+    if (program.isBest(ind)) break;
 
-    let chars = program.getCharsInLeftNotInRight();
-    let neighbor = program.getRandomNeighbor(ind, chars);
-
+    let neighbor = program.getRandomNeighbor(ind);
     program.evaluate(neighbor);
-    console.log('neighbor', neighbor.toString(), neighbor.fitness);
 
     if (neighbor.fitness > ind.fitness) {
+        console.log(`Better: [${ind.toString()} ${ind.fitness}] -> [${neighbor.toString()} ${neighbor.fitness}]`);
         ind = neighbor;
     } else if (neighbor.fitness == ind.fitness) {
         // tiebreaker
-        if (neighbor.tree.toString().length < ind.tree.toString().length) {
+        if (neighbor.tree.toString().length <= ind.tree.toString().length) {
             ind = neighbor;
         }
     }
 
-} while(true);
+} while(--maxEvaluations > 0);
 
-console.log('Solution', ind.toString());
+console.log('Solution', ind.toString(), ind.fitness);
