@@ -7,13 +7,18 @@ import Terminal from "../nodes/Terminal";
 import MutationOperator from "../operators/MutationOperator";
 import CrossoverOperator from "../operators/CrossoverOperator";
 import SubtreeCrossover from "../operators/SubtreeCrossover";
+import PointMutation from "../operators/PointMutation";
 import Utils from "../Utils";
 
 
 export default class Program extends BaseProgram {
-    public crossoverProbability = 80;
-    public mutationProbability = 30;
+    readonly crossoverProbability = 80;
+    readonly mutationProbability = 30;
+    readonly populationSize = 100;
+    readonly maxGenerationNumber = 1000;
+    readonly maxInitialDepth = 5;
 
+    private generationNumber = 0;
     private crossoverOperator: CrossoverOperator;
     private mutationOperator: MutationOperator;
 
@@ -21,10 +26,46 @@ export default class Program extends BaseProgram {
         super(instanceName);
 
         this.crossoverOperator = new SubtreeCrossover();
+        this.mutationOperator = new PointMutation();
     }
 
     public generateInitialPopulation(): Population {
-        return new Population();
+        let pop = new Population();
+
+        // 1. One individual for each string in left
+        this.left.forEach(phrase => {
+            let neo = this.factory.createFromString(phrase);
+            pop.add(neo);
+        });
+
+        // 2. One individual for each valid char in left
+        this.validLeftChars.forEach(letter => {
+            let neo = this.factory.createFromString(letter);
+            pop.add(neo);
+        });
+
+        // 3. Generate individuals until we finish our population
+        while (pop.length < this.populationSize) {
+            let depth = Utils.nextInt(this.maxInitialDepth);
+            let neo = this.factory.generateRandom(depth);
+            pop.add(neo);
+        }
+
+        return pop;
+    }
+
+    public shouldStop(population: Population): boolean {
+        let hasFound = false;
+
+        population.forEach(ind => {
+            if (this.isBest(ind)) {
+                hasFound = true;
+                return false; // stop
+            }
+        });
+
+        if (hasFound) return hasFound;
+        return this.generationNumber < this.maxGenerationNumber;
     }
 
     public doCrossover(father: Individual, population: Population): Individual {
@@ -35,6 +76,18 @@ export default class Program extends BaseProgram {
     public doMutation(father: Individual): Individual {
         let chars = this.validLeftChars.concat(this.validRigthChars);
         return this.mutationOperator.mutate(father, chars);
+    }
+
+    public doSelection(population: Population): void {
+        // selecting by elitism
+        population.sortByFitness();
+
+        let len = population.length;
+
+        while (len > this.populationSize) {
+            population.removeByIndex(len - 1);
+            len -= 1;
+        }
     }
 
 }

@@ -6,10 +6,19 @@ export default class Population {
     protected individuals: Individual[] = [];
     private dirty: boolean = true;
 
+    public get length(): number {
+        return this.individuals.length;
+    }
+
+    public sortByFitness(): void {
+        this.individuals.sort((a, b) => a.fitness - b.fitness);
+    }
+
     public forEach(fn: (ind:Individual) => void): void {
         let len = this.individuals.length;
         for (let i = 0; i < len; i ++) {
-            fn(this.individuals[i]);
+            let shouldContinue = fn(this.individuals[i]);
+            if (shouldContinue === false) break;
         }
     }
 
@@ -24,6 +33,10 @@ export default class Population {
 
     public addAll(inds: Individual[]): void {
         inds.forEach(ind => this.add(ind));
+    }
+
+    public removeByIndex(index: number): void {
+        this.individuals.splice(index, 1);
     }
 
     public isDirty(): boolean {

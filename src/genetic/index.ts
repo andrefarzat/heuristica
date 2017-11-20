@@ -23,18 +23,19 @@ do {
     population.forEach(ind => {
         let chance = Utils.nextInt(100);
         if (chance < program.crossoverProbability) {
-            let newInd = program.doCrossover(ind, population);
-            population.add(newInd);
+            let neo = program.doCrossover(ind, population);
+            population.add(neo);
         }
 
         chance = Utils.nextInt(100);
         if (chance < program.mutationProbability) {
-            let newInd = program.doMutation(ind);
+            let neo = program.doMutation(ind);
+            population.add(neo);
         }
     });
 
     // 4. Seleção
-    population = program.doSelection(population);
+    program.doSelection(population);
 
     // 5. Repeat
 } while (true);

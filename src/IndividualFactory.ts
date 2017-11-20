@@ -8,6 +8,27 @@ import Utils from "./Utils";
 export default class IndividualFactory {
     public constructor(public leftChars: string[], public rightChars: string[]) {}
 
+    public createFromString(phrase: string) : Individual {
+        let ind = new Individual();
+        let currentFunc = new Func();
+        ind.tree = currentFunc;
+
+        phrase.split('').forEach(letter => {
+            if (!currentFunc.left) {
+                currentFunc.left = new Terminal(letter);
+            } else {
+                let func = new Func();
+                func.type = Func.Types.concatenation;
+                func.left = new Terminal(letter);
+
+                currentFunc.right = func;
+                currentFunc = func;
+            }
+        });
+
+        return ind;
+    }
+
     public getRandomCharFromLeft(): Terminal {
         let char = Utils.getRandomlyFromList(this.leftChars);
         return new Terminal(char);
@@ -161,5 +182,18 @@ export default class IndividualFactory {
         }
 
         return this.appendAtEnd(ind, node);
+    }
+
+    public generateRandom(depth: number): Individual {
+        let ind = new Individual();
+        ind.tree = new Func();
+        ind.tree.left = this.getRandomCharFromLeft();
+        ind.tree.right = this.getRandomCharFromLeft();
+
+        while (--depth > 0) {
+            ind = this.generateRandomlyFrom(ind);
+        }
+
+        return ind;
     }
 }
