@@ -53,8 +53,8 @@ export default class Func implements Node {
 
     public clone(): Func {
         let func = new Func();
-        func.left = this.left ? this.left.clone() : this.left;
-        func.right = this.right ? this.right.clone() : this.right;
+        func.left = this.left.clone();
+        func.right = this.right.clone();
         func.type = this.type;
         return func;
     }
@@ -81,14 +81,19 @@ export default class Func implements Node {
     }
 
     public getNodes(): Node[] {
-        let nodes: Node[] = [];
+        let nodes: Node[] = [this];
 
-        if (this.left  instanceof Func) nodes = nodes.concat(this.left.getNodes());
-        if (this.right instanceof Func) nodes = nodes.concat(this.right.getNodes());
+        if (this.left instanceof Func) {
+            nodes = nodes.concat(this.left.getNodes());
+        } else {
+            nodes.push(this.left);
+        }
 
-        nodes.push(this);
-        nodes.push(this.left);
-        nodes.push(this.right);
+        if (this.right instanceof Func) {
+            nodes = nodes.concat(this.right.getNodes());
+        } else {
+            nodes.push(this.right);
+        }
 
         return nodes;
     }

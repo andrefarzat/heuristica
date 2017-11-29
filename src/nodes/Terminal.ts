@@ -20,8 +20,7 @@ export default class Terminal implements Node {
     }
 
     public clone(): Terminal {
-        let terminal = new Terminal();
-        terminal.value = this.value;
+        let terminal = new Terminal(this.value);
         return terminal;
     }
 }
