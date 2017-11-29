@@ -18,7 +18,7 @@ export default class Program extends BaseProgram {
     readonly maxGenerationNumber = 1000;
     readonly maxInitialDepth = 5;
 
-    private generationNumber = 0;
+    public generationNumber = 0;
     private crossoverOperator: CrossoverOperator;
     private mutationOperator: MutationOperator;
 
@@ -88,6 +88,8 @@ export default class Program extends BaseProgram {
             population.removeByIndex(len - 1);
             len -= 1;
         }
+
+        this.generationNumber ++;
     }
 
 }

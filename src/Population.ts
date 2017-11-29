@@ -11,7 +11,7 @@ export default class Population {
     }
 
     public sortByFitness(): void {
-        this.individuals.sort((a, b) => a.fitness - b.fitness);
+        this.individuals.sort((a, b) => b.fitness - a.fitness);
     }
 
     public forEach(fn: (ind:Individual) => void | boolean): void {

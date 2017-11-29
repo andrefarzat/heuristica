@@ -81,7 +81,7 @@ export default class Func implements Node {
     }
 
     public getNodes(): Node[] {
-        let nodes: Node[] = [this];
+        let nodes: Node[] = [];
 
         if (this.left instanceof Func) {
             nodes = nodes.concat(this.left.getNodes());
@@ -107,7 +107,7 @@ export default class Func implements Node {
     }
 
     public getFuncs(): Func[] {
-        let nodes: Func[] = [];
+        let nodes: Func[] = [this];
         this.getNodes().forEach(node => {
             if (node instanceof Func) nodes.push(node);
         });

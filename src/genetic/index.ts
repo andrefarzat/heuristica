@@ -36,8 +36,14 @@ do {
 
     // 4. Seleção
     program.doSelection(population);
+    let text = [
+        `[gen ${program.generationNumber} of ${program.maxGenerationNumber}]`,
+        `[Current best {${population.get(0).fitness}} of ${program.getMaxFitness()}] ${population.get(0).toString()}`
+    ];
+    console.log(text.join(''));
 
     // 5. Repeat
 } while (true);
 
-var a = 1;
+
+console.log(`[Best found ${population.get(0).fitness}} of ${program.getMaxFitness()}] ${population.get(0).toString()}`)

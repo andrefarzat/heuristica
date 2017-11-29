@@ -104,4 +104,8 @@ export default class Program {
         let regex = ind.toRegex();
         ind.fitness = this.evaluateRegex(regex);
     }
+
+    public getMaxFitness(): number {
+        return this.left.length + this.right.length;
+    }
 }
