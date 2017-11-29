@@ -14,8 +14,8 @@ import Utils from "../Utils";
 export default class Program extends BaseProgram {
     readonly crossoverProbability = 80;
     readonly mutationProbability = 30;
-    readonly populationSize = 100;
-    readonly maxGenerationNumber = 1000;
+    readonly populationSize = 1000;
+    readonly maxGenerationNumber = 300;
     readonly maxInitialDepth = 5;
 
     public generationNumber = 0;
@@ -70,6 +70,12 @@ export default class Program extends BaseProgram {
 
     // @override
     public evaluate(ind: Individual): void {
+        let str = ind.toString();
+        if (str.length == 0) {
+            ind.fitness = 0;
+            return;
+        }
+
         try {
             let regex = ind.toRegex();
             ind.fitness = this.evaluateRegex(regex);
@@ -98,7 +104,7 @@ export default class Program extends BaseProgram {
 
         while (len > this.populationSize) {
             len -= 1;
-            population.removeByIndex(len);
+            population.pop();
         }
 
         this.generationNumber ++;

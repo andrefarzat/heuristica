@@ -1,7 +1,7 @@
 import Program from "./Program";
 
 
-const program = new Program('four');
+const program = new Program('names');
 program.init();
 
 var ind = program.generateInitialIndividual();
@@ -32,7 +32,6 @@ do {
             if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.length) {
                 bestNeighbor = neighbor.value;
             }
-            // console.log(neighbor.value, fitness);
         }
     } while(true)
 
@@ -44,30 +43,5 @@ do {
 } while(hasFoundBetter);
 
 
-console.log('Solution: ', solution, bestFitness);
-console.log('Max: ', program.left.length + program.right.length);
-
-/*
-
-var maxEvaluations = 50000;
-
-do {
-    if (program.isBest(ind)) break;
-
-    let neighbor = program.getRandomNeighbor(ind);
-    program.evaluate(neighbor);
-
-    if (neighbor.fitness > ind.fitness) {
-        console.log(`Better: [${ind.toString()} ${ind.fitness}] -> [${neighbor.toString()} ${neighbor.fitness}]`);
-        ind = neighbor;
-    } else if (neighbor.fitness == ind.fitness) {
-        // tiebreaker
-        if (neighbor.tree.toString().length <= ind.tree.toString().length) {
-            ind = neighbor;
-        }
-    }
-
-} while(--maxEvaluations > 0);
-
-console.log('Solution', ind.toString(), ind.fitness);
-*/
+console.log(`Solution: ${solution}`);
+console.log(`Fitness: ${bestFitness} of ${program.left.length + program.right.length}`);

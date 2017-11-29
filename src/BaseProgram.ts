@@ -10,6 +10,7 @@ export default class Program {
     public right: string[] = [];
     public chars: {left: {[key: string]: number}, right: {[key: string]: number}} = {left: {}, right: {}};
     public factory: IndividualFactory;
+    public currentBest: Individual = null;
 
     public get validLeftChars(): string[] {
         return Object.keys(this.chars.left);
@@ -68,6 +69,7 @@ export default class Program {
         let quantity = this.left.length + this.right.length;
         if (ind.fitness >= quantity) {
             console.log(`[isBest ${ind.fitness}] ${ind.toString()}`);
+            this.currentBest = ind;
             return true;
         } else {
             return false;

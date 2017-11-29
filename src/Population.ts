@@ -1,5 +1,6 @@
 import Individual from "./Individual";
 import Utils from "./Utils";
+import IndividualFactory from "./IndividualFactory";
 
 
 export default class Population {
@@ -48,6 +49,10 @@ export default class Population {
         this.individuals.splice(index, 1);
     }
 
+    public pop(): Individual {
+        return this.individuals.pop();
+    }
+
     public isDirty(): boolean {
         return this.dirty;
     }
@@ -57,7 +62,15 @@ export default class Population {
             // TODO: add the roullete implementation
         }
 
-        // TODO: Improve this
-        return Utils.getRandomlyFromList(this.individuals);
+        let maxTries = 10;
+
+        while (maxTries > 0) {
+            // TODO: Improve this
+            let ind = Utils.getRandomlyFromList(this.individuals);
+            if (ind.fitness > 0) return ind;
+            maxTries --;
+        }
+
+        throw new Error("10 tries and no valid individual. Something is wrong");
     }
 }
