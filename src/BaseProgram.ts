@@ -66,7 +66,12 @@ export default class Program {
     public isBest(ind: Individual): boolean {
         this.evaluate(ind);
         let quantity = this.left.length + this.right.length;
-        return ind.fitness >= quantity;
+        if (ind.fitness >= quantity) {
+            console.log(`[isBest ${ind.fitness}] ${ind.toString()}`);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public isBestRegex(regex: RegExp | string): boolean {

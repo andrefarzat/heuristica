@@ -14,11 +14,11 @@ export default class Population {
         this.individuals.sort((a, b) => a.fitness - b.fitness);
     }
 
-    public forEach(fn: (ind:Individual) => void): void {
+    public forEach(fn: (ind:Individual) => void | boolean): void {
         let len = this.individuals.length;
         for (let i = 0; i < len; i ++) {
             let shouldContinue = fn(this.individuals[i]);
-            if (shouldContinue === false) break;
+            if (shouldContinue == false) break;
         }
     }
 
@@ -49,8 +49,6 @@ export default class Population {
         }
 
         // TODO: Improve this
-        let len = this.individuals.length;
-        let index = Utils.nextInt(len);
-        return this.get(index);
+        return Utils.getRandomlyFromList(this.individuals);
     }
 }

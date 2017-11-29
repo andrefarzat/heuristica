@@ -39,7 +39,7 @@ export default class Utils {
 
     static getRandomlyFromList<T>(list: T[]) {
         let len = list.length;
-        let index = Utils.nextInt(len);
+        let index = Utils.nextInt(len > 0 ? len - 1 : 0);
         return list[index];
     }
 }

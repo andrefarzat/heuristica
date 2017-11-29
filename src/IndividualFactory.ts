@@ -26,6 +26,7 @@ export default class IndividualFactory {
             }
         });
 
+        currentFunc.right = new Terminal('');
         return ind;
     }
 

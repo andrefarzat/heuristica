@@ -6,7 +6,8 @@
   "author": "Andre Farzat",
   "license": "MIT",
   "scripts": {
-    "localsearch": "ts-node src/localsearch/index.ts"
+    "localsearch": "ts-node src/localsearch/index.ts",
+    "genetic": "ts-node src/genetic/index.ts"
   },
   "dependencies": {
     "@types/node": "^8.0.34",

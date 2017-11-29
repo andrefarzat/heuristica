@@ -40,5 +40,4 @@ do {
     // 5. Repeat
 } while (true);
 
-debugger;
 var a = 1;

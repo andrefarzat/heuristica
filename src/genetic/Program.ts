@@ -65,7 +65,7 @@ export default class Program extends BaseProgram {
         });
 
         if (hasFound) return hasFound;
-        return this.generationNumber < this.maxGenerationNumber;
+        return this.generationNumber > this.maxGenerationNumber;
     }
 
     public doCrossover(father: Individual, population: Population): Individual {
