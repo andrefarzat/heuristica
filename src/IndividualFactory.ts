@@ -62,7 +62,7 @@ export default class IndividualFactory {
 
     public insertRandomly(ind: Individual, node: Node): Individual {
         let newInd = ind.clone();
-        let currentFunc = Utils.getRandomlyFromList(newInd.tree.getFuncs());
+        let currentFunc = Utils.getRandomlyFromList(newInd.getFuncs());
         let func = new Func();
         func.type = Func.Types.concatenation;
         func.left = node;
@@ -79,7 +79,7 @@ export default class IndividualFactory {
 
     public swapRandomly(ind: Individual, node: Node): Individual {
         let newInd = ind.clone();
-        let currentTerminal = Utils.getRandomlyFromList(newInd.tree.getTerminals());
+        let currentTerminal = Utils.getRandomlyFromList(newInd.getTerminals());
         let parent = newInd.getParentOf(currentTerminal);
         if (parent) {
             if (parent.side === 'left') parent.func.left = node;
@@ -92,7 +92,7 @@ export default class IndividualFactory {
     public addStartOperator(ind: Individual): Individual {
         let node = this.getRandomCharFromLeft();
         let newInd = ind.clone();
-        let funcStartOperator = newInd.tree.getFuncs().find(current => current.type == Func.Types.lineBegin);
+        let funcStartOperator = newInd.getFuncs().find(current => current.type == Func.Types.lineBegin);
 
         if (!funcStartOperator) {
             let func = new Func();
@@ -110,7 +110,7 @@ export default class IndividualFactory {
     public addEndOperator(ind: Individual): Individual {
         let node = this.getRandomCharFromLeft();
         let newInd = ind.clone();
-        let funcEndOperator = newInd.tree.getFuncs().find(current => current.type == Func.Types.lineEnd);
+        let funcEndOperator = newInd.getFuncs().find(current => current.type == Func.Types.lineEnd);
 
         if (!funcEndOperator) {
             let func = new Func();
@@ -127,7 +127,7 @@ export default class IndividualFactory {
 
     public addToNegation(ind: Individual, node: Node): Individual {
         let newInd = ind.clone();
-        let func = newInd.tree.getFuncs().find(current => current.type == Func.Types.negation);
+        let func = newInd.getFuncs().find(current => current.type == Func.Types.negation);
 
         if (!func) {
             func = new Func();

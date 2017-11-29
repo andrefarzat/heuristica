@@ -64,8 +64,20 @@ export default class Program extends BaseProgram {
             }
         });
 
-        if (hasFound) return hasFound;
-        return this.generationNumber > this.maxGenerationNumber;
+        // if (hasFound) return hasFound;
+        return this.generationNumber >= this.maxGenerationNumber;
+    }
+
+    // @override
+    public evaluate(ind: Individual): void {
+        try {
+            let regex = ind.toRegex();
+            ind.fitness = this.evaluateRegex(regex);
+        } catch(e) {
+            // FIXME: Invalid Regex we discard. We should treat this
+            // console.log(e.message);
+            ind.fitness = 0;
+        }
     }
 
     public doCrossover(father: Individual, population: Population): Individual {
@@ -80,13 +92,13 @@ export default class Program extends BaseProgram {
 
     public doSelection(population: Population): void {
         // selecting by elitism
-        population.sortByFitness();
+        population.sortToElitism();
 
         let len = population.length;
 
         while (len > this.populationSize) {
-            population.removeByIndex(len - 1);
             len -= 1;
+            population.removeByIndex(len);
         }
 
         this.generationNumber ++;

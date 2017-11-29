@@ -6,10 +6,10 @@ export default class SubtreeCrossover implements CrossoverOperator {
     public cross(father: Individual, mother: Individual) : Individual {
         let neo = father.clone();
         // 1. Getting a random function from father
-        let func = Utils.getRandomlyFromList(father.tree.getFuncs());
+        let func = Utils.getRandomlyFromList(father.getFuncs());
 
         // 2. Getting a random node from mother
-        let node = Utils.getRandomlyFromList(mother.tree.getNodes());
+        let node = Utils.getRandomlyFromList(mother.getNodes()).clone();
 
         // 3. Replacing the node from mother's node
         let shouldBeLeft = Utils.nextBoolean();

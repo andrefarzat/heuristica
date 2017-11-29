@@ -1,4 +1,5 @@
 import Func from "./nodes/Func";
+import Terminal from "./nodes/Terminal";
 import Node from "./nodes/Node";
 
 
@@ -26,7 +27,7 @@ export default class Individual {
     }
 
     public getParentOf(node: Node): {func: Func, side: 'left' | 'right'} {
-        let funcs = this.tree.getFuncs();
+        let funcs = this.getFuncs();
 
         for(let i = 0; i < funcs.length; i ++) {
             let current = funcs[i];
@@ -35,5 +36,21 @@ export default class Individual {
         }
 
         return null;
+    }
+
+    public getNodes(): Node[] {
+        let nodes: Node[] = [this.tree];
+        nodes = nodes.concat(this.tree.getNodes());
+        return nodes;
+    }
+
+    public getFuncs(): Func[] {
+        let funcs: Func[] = [this.tree];
+        funcs = funcs.concat(this.tree.getFuncs());
+        return funcs;
+    }
+
+    public getTerminals(): Terminal[] {
+        return this.tree.getTerminals();
     }
 }

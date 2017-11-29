@@ -10,8 +10,17 @@ export default class Population {
         return this.individuals.length;
     }
 
-    public sortByFitness(): void {
-        this.individuals.sort((a, b) => b.fitness - a.fitness);
+    public sortToElitism(): void {
+        this.individuals.sort(function(a, b) {
+            if (a.fitness > b.fitness) return -1;
+            if (a.fitness < b.fitness) return 1;
+
+            // tiebreaker
+            if (a.toString().length < b.toString().length) return -1;
+            if (a.toString().length > b.toString().length) return 1;
+
+            return 0; // Well, we really have a tie
+        });
     }
 
     public forEach(fn: (ind:Individual) => void | boolean): void {

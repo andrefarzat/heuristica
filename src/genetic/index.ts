@@ -4,7 +4,7 @@ import Population from "../Population";
 import Utils from "../Utils";
 
 
-const program = new Program('four');
+const program = new Program('foo');
 program.init();
 
 

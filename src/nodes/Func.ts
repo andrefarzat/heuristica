@@ -83,16 +83,14 @@ export default class Func implements Node {
     public getNodes(): Node[] {
         let nodes: Node[] = [];
 
+        nodes.push(this.left);
         if (this.left instanceof Func) {
             nodes = nodes.concat(this.left.getNodes());
-        } else {
-            nodes.push(this.left);
         }
 
+        nodes.push(this.right);
         if (this.right instanceof Func) {
             nodes = nodes.concat(this.right.getNodes());
-        } else {
-            nodes.push(this.right);
         }
 
         return nodes;
