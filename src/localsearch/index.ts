@@ -1,7 +1,7 @@
 import Program from "./Program";
 
 
-const program = new Program('names');
+const program = new Program('books');
 program.init();
 
 var ind = program.generateInitialIndividual();

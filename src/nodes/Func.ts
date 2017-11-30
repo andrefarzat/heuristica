@@ -8,12 +8,12 @@ enum FuncTypes {
     or = "•|•",
     lineBegin = "^•",
     lineEnd = "•$",
-    // zeroOrMore = "•*+",
-    // oneOrMore = "•?+",
+    zeroOrMore = "•*+",
+    oneOrMore = "•?+",
     group = "(•)",
     negation = "[^•]",
     range = "[•]",
-    // more = "•++",
+    more = "•++",
 }
 
 
