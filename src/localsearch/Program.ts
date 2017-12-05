@@ -62,8 +62,8 @@ export default class Program extends BaseProgram {
         for(let i = 0; i <= len; i++) {
             for(let j = 0; j < chars.length; j++) {
                 let char = chars[j];
-                if (char == '^' && firstLetter == '^') continue;
-                if (char == '$' && lastLetter  == '$') continue;
+                // if (char == '^' && firstLetter == '^') continue;
+                // if (char == '$' && lastLetter  == '$') continue;
 
                 // Swapping
                 let currentSolution = solution.split('');
@@ -109,6 +109,21 @@ export default class Program extends BaseProgram {
             for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
                 let char = '[^'+ this.rightCharsNotInLeft[j] + ']';
                 yield solution.substr(0, i) + char + solution.substr(i);
+            }
+        }
+
+        // Operator: Concatenation (but from right chars not in left)
+        for(let i = 0; i <= len; i++) {
+            for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
+                let char = chars[j];
+
+                // Swapping
+                let currentSolution = solution.split('');
+                currentSolution[i] = char;
+                yield currentSolution.join('');
+
+                // Appending
+                yield solution.substr(0, i) + char + solution.substr(i)
             }
         }
 

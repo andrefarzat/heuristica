@@ -8,6 +8,7 @@
         "lib": ["es6"]
     },
     "files": [
-        "./src/genetic/index.ts"
+        "./src/genetic/index.ts",
+        "./src/localsearch/index.ts"
     ]
 }

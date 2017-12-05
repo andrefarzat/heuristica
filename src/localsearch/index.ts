@@ -2,14 +2,15 @@ const colors = require('colors/safe');
 import Program from "./Program";
 import Utils from "../Utils";
 
+
+const program = new Program('four');
+program.init();
+
+
 const LOG_LEVEL = 2;
 function log(level: number, message: string) {
     if (level <= LOG_LEVEL) console.log(message);
 }
-
-
-const program = new Program('family');
-program.init();
 
 log(1, `[Instance]: ${program.instanceName}`);
 log(1, `[left Phrases]: ${program.left}`);
@@ -23,7 +24,7 @@ log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
 //var ind = program.generateInitialIndividual();
 let ind = program.factory.generateRandom(Utils.nextInt(5));
-program.budget = 200000;
+program.budget = 100000 * 6;
 
 
 let solution = ind.toString();
@@ -47,6 +48,7 @@ do {
         var neighbor = neighborhood.next();
         if (neighbor.done) break;
         let fitness = program.evaluateString(neighbor.value);
+        log(4, `[Neighbor]: ${neighbor.value}`);
 
         if (fitness > bestFitness) {
             bestFitness = fitness;
@@ -71,7 +73,7 @@ do {
         program.localSolutions.push(solution);
 
         // We restart randonlly
-        let ind = program.factory.generateRandom(Utils.nextInt(5));
+        let ind = program.factory.generateRandom(Utils.nextInt(10));
         solution = ind.toString();
         bestFitness = program.evaluateString(solution);
         log(2, ' ');
@@ -96,16 +98,17 @@ function sorter(a:string, b: string): number {
 // log(2, ' ');
 // log(2, `Was found ${program.localSolutions.length} local solution(s)`);
 
-
-// program.localSolutions.sort(sorter);
-// program.localSolutions.forEach(solution => {
-//     let fitness = program.evaluateString(solution);
-//     log(2, `[Local Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`);
-// });
-
 // Solutions
 log(1, ' ');
-log(1, `Was found ${program.localSolutions.length} solution(s)`);
+log(2, `Was found ${program.localSolutions.length} local solution(s)`);
+program.localSolutions.sort(sorter);
+program.localSolutions.forEach(solution => {
+    let fitness = program.evaluateString(solution);
+    log(3, `[Local Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`);
+});
+
+log(3, ' ');
+log(1, `Was found ${program.solutions.length} solution(s)`);
 
 program.solutions.sort(sorter);
 program.solutions.forEach((solution, i) => {

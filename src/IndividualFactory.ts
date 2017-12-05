@@ -195,6 +195,6 @@ export default class IndividualFactory {
             ind = this.generateRandomlyFrom(ind);
         }
 
-        return ind;
+        return this.generateRandomlyFrom(ind);
     }
 }
