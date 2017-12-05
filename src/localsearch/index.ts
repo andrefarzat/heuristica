@@ -2,18 +2,23 @@ const colors = require('colors/safe');
 import Program from "./Program";
 import Utils from "../Utils";
 
+const LOG_LEVEL = 2;
+function log(level: number, message: string) {
+    if (level <= LOG_LEVEL) console.log(message);
+}
 
-const program = new Program('books');
+
+const program = new Program('family');
 program.init();
 
-console.log('[Instance]: ', program.instanceName);
-console.log('[left Phrases]: ', program.left);
-console.log('[right Phrases]: ', program.right);
+log(1, `[Instance]: ${program.instanceName}`);
+log(1, `[left Phrases]: ${program.left}`);
+log(1, `[right Phrases]: ${program.right}`);
 
-console.log(`[left Chars]: ${program.validLeftChars}`);
-console.log(`[right Chars]: ${program.validRigthChars}`);
-console.log('[left Chars Not In Right]: ', program.leftCharsNotInRight);
-console.log('[right Chars Not In Left]: ', program.rightCharsNotInLeft);
+log(1, `[left Chars]: ${program.validLeftChars}`);
+log(1, `[right Chars]: ${program.validRigthChars}`);
+log(1, `[left Chars Not In Right]: ${program.leftCharsNotInRight}`);
+log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
 
 //var ind = program.generateInitialIndividual();
@@ -23,8 +28,8 @@ program.budget = 200000;
 
 let solution = ind.toString();
 let bestFitness = program.evaluateString(solution);
-console.log('');
-console.log(colors.green(`Initial: ${solution}`));
+log(1, '');
+log(1, colors.green(`Initial: ${solution}`));
 
 do {
     var hasFoundBetter = false;
@@ -34,7 +39,7 @@ do {
     }
 
     if (program.shouldStop()) break;
-    console.log(colors.magenta(`[Evaluations ${program.evalutionCount} of ${program.budget}]`));
+    log(3, colors.magenta(`[Evaluations ${program.evalutionCount} of ${program.budget}]`));
 
     let neighborhood = program.generateNeighborhood(solution);
     let bestNeighbor = null;
@@ -47,11 +52,11 @@ do {
             bestFitness = fitness;
             solution = neighbor.value;
             hasFoundBetter = true;
-            console.log(`[Found better]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
+            log(3, `[Found better]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
         } else {
             if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.length) {
                 bestNeighbor = neighbor.value;
-                console.log(`[Found shorter]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
+                log(3, `[Found shorter]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
             }
         }
     } while(true)
@@ -62,24 +67,20 @@ do {
     }
 
     if (!hasFoundBetter) {
-        console.log(colors.yellow(`[Best local is]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
+        log(2, colors.yellow(`[Best local is]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
+        program.localSolutions.push(solution);
 
         // We restart randonlly
         let ind = program.factory.generateRandom(Utils.nextInt(5));
         solution = ind.toString();
         bestFitness = program.evaluateString(solution);
-        console.log(' ');
-        console.log(colors.green(`[Jumped to]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
+        log(2, ' ');
+        log(2, colors.green(`[Jumped to]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
     }
 
 } while(true);
 
-
-console.log(' ');
-console.log(`Was found ${program.solutions.length} solution(s)`);
-
-
-program.solutions.sort((a, b) => {
+function sorter(a:string, b: string): number {
     let Afitness = program.evaluateString(a);
     let Bfitness = program.evaluateString(b);
     if (Afitness > Bfitness) return -1;
@@ -89,9 +90,26 @@ program.solutions.sort((a, b) => {
     if (a.length < b.length) return -1;
 
     return 0;
-});
+};
 
-program.solutions.forEach(solution => {
+// // Local solutions
+// log(2, ' ');
+// log(2, `Was found ${program.localSolutions.length} local solution(s)`);
+
+
+// program.localSolutions.sort(sorter);
+// program.localSolutions.forEach(solution => {
+//     let fitness = program.evaluateString(solution);
+//     log(2, `[Local Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`);
+// });
+
+// Solutions
+log(1, ' ');
+log(1, `Was found ${program.localSolutions.length} solution(s)`);
+
+program.solutions.sort(sorter);
+program.solutions.forEach((solution, i) => {
     let fitness = program.evaluateString(solution);
-    console.log(`[Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`);
+    let txt = `[Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`;
+    log(1, (i == 0) ? colors.green(txt) : txt);
 });
