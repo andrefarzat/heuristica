@@ -11,6 +11,7 @@ export default class Program {
     public chars: {left: {[key: string]: number}, right: {[key: string]: number}} = {left: {}, right: {}};
     public factory: IndividualFactory;
     public currentBest: Individual = null;
+    public evalutionCount: number = 0;
 
     public get validLeftChars(): string[] {
         return Object.keys(this.chars.left);
@@ -87,6 +88,7 @@ export default class Program {
     }
 
     public evaluateRegex(regex: RegExp): number {
+        this.evalutionCount += 1;
         let fitness = 0;
         this.left .forEach(name => fitness += regex.test(name) ? 1 : 0);
         this.right.forEach(name => fitness += regex.test(name) ? 0 : 1);

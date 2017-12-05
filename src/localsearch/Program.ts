@@ -7,10 +7,9 @@ import Terminal from "../nodes/Terminal";
 export default class Program extends BaseProgram {
     public budget: number = 2000;
     public solutions: string[] = [];
-    public i: number = 0;
 
     public shouldStop(): boolean {
-        return this.i >= this.budget;
+        return this.evalutionCount >= this.budget;
     }
 
     public addSolution(solution: string) {

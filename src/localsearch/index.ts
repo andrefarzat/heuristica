@@ -18,7 +18,7 @@ console.log('[right Chars Not In Left]: ', program.rightCharsNotInLeft);
 
 //var ind = program.generateInitialIndividual();
 let ind = program.factory.generateRandom(Utils.nextInt(5));
-program.budget = 100;
+program.budget = 200000;
 
 
 let solution = ind.toString();
@@ -34,12 +34,7 @@ do {
     }
 
     if (program.shouldStop()) break;
-    program.i += 1;
-    if (program.i % 10 == 0) {
-        console.log(' ');
-        console.log(colors.magenta(`[loop ${program.i} of ${program.budget}]`));
-        console.log(' ');
-    }
+    console.log(colors.magenta(`[Evaluations ${program.evalutionCount} of ${program.budget}]`));
 
     let neighborhood = program.generateNeighborhood(solution);
     let bestNeighbor = null;
