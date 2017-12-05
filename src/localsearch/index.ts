@@ -1,16 +1,28 @@
 import Program from "./Program";
+import Utils from "../Utils";
 
 
 const program = new Program('books');
 program.init();
 
-var ind = program.generateInitialIndividual();
+console.log('[Instance]: ', program.instanceName);
+console.log('[left Phrases]: ', program.left);
+console.log('[right Phrases]: ', program.right);
+
+console.log(`[left Chars]: ${program.validLeftChars}`);
+console.log(`[right Chars]: ${program.validRigthChars}`);
+console.log('[left Chars Not In Right]: ', program.leftCharsNotInRight);
+console.log('[right Chars Not In Left]: ', program.rightCharsNotInLeft);
+
+
+//var ind = program.generateInitialIndividual();
+var ind = program.factory.generateRandom(Utils.nextInt(5));
+
 let solution = ind.toString();
 let bestFitness = program.evaluateString(solution);
+console.log('');
 console.log('Initial: ', solution);
 
-console.log('[leftCharsNotInRight]: ', program.leftCharsNotInRight);
-console.log('[rightCharsNotInLeft]: ', program.rightCharsNotInLeft);
 
 do {
     var hasFoundBetter = false;

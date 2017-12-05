@@ -16,7 +16,7 @@ export default class Program extends BaseProgram {
     readonly mutationProbability = 30;
     readonly populationSize = 1000;
     readonly maxGenerationNumber = 300;
-    readonly maxInitialDepth = 5;
+    public readonly maxInitialDepth = 5;
 
     public generationNumber = 0;
     private crossoverOperator: CrossoverOperator;
