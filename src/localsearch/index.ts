@@ -1,11 +1,12 @@
 const colors = require('colors/safe');
 const args = require('args');
-import Program from "./Program";
+import Program, {Solution} from "./Program";
 import Utils from "../Utils";
 
 
 args.option('name', 'O nome da instancia')
-    .option('depth', 'O tamanho do depth (default 5)');
+    .option('depth', 'O tamanho do depth (default 5)')
+    .option('i', 'O número do loop');
 
 const flags = args.parse(process.argv);
 
@@ -18,7 +19,7 @@ const program = new Program(flags.name);
 program.init();
 
 
-const LOG_LEVEL = 2;
+const LOG_LEVEL = 0;
 function log(level: number, message: string) {
     if (level <= LOG_LEVEL) console.log(message);
 }
@@ -83,7 +84,7 @@ do {
 
     if (!hasFoundBetter) {
         log(2, colors.yellow(`[Best local is]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
-        program.localSolutions.push(solution);
+        program.addLocalSolution(solution);
 
         // We restart randonlly
         let ind = program.factory.generateRandom(DEPTH);
@@ -95,14 +96,12 @@ do {
 
 } while(true);
 
-function sorter(a:string, b: string): number {
-    let Afitness = program.evaluateString(a);
-    let Bfitness = program.evaluateString(b);
-    if (Afitness > Bfitness) return -1;
-    if (Afitness < Bfitness) return 1;
+function sorter(a: Solution, b: Solution): number {
+    if (a.fitness > b.fitness) return -1;
+    if (a.fitness < b.fitness) return 1;
 
-    if (a.length > b.length) return 1;
-    if (a.length < b.length) return -1;
+    if (a.regex.length > b.regex.length) return 1;
+    if (a.regex.length < b.regex.length) return -1;
 
     return 0;
 };
@@ -116,8 +115,7 @@ log(1, ' ');
 log(2, `Was found ${program.localSolutions.length} local solution(s)`);
 program.localSolutions.sort(sorter);
 program.localSolutions.forEach(solution => {
-    let fitness = program.evaluateString(solution);
-    log(3, `[Local Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`);
+    log(3, `[Local Solution]: ${solution.regex}; [Fitness ${solution.fitness} of ${program.getMaxFitness()}]; [Length ${solution.regex.length}]`);
 });
 
 log(3, ' ');
@@ -125,7 +123,18 @@ log(1, `Was found ${program.solutions.length} solution(s)`);
 
 program.solutions.sort(sorter);
 program.solutions.forEach((solution, i) => {
-    let fitness = program.evaluateString(solution);
-    let txt = `[Solution]: ${solution}; [Fitness ${fitness} of ${program.getMaxFitness()}]; [Length ${solution.length}]`;
+    let txt = `[Solution]: ${solution.regex}; [Fitness ${solution.fitness} of ${program.getMaxFitness()}]; [Length ${solution.regex.length}]`;
     log(1, (i == 0) ? colors.green(txt) : txt);
 });
+
+
+
+if (LOG_LEVEL > 0) process.exit();
+
+!function() {
+    let bestSolution = program.getBestSolution();
+
+    // nome, depth, i, melhor solução, melhor fitness, número de comparações, tempo de execução
+    let txt = [flags.name, DEPTH, flags.i, bestSolution.regex, bestSolution.fitness, bestSolution.count].join(',');
+    console.log(txt);
+}();

@@ -3,18 +3,31 @@ import Func from "../nodes/Func";
 import Individual from "../Individual";
 import Terminal from "../nodes/Terminal";
 
+export interface Solution {
+    regex: string;
+    fitness: number;
+    date: Date;
+    count: number;
+}
+
 
 export default class Program extends BaseProgram {
     public budget: number = 2000;
-    public solutions: string[] = [];
-    public localSolutions: string[] = [];
+    public solutions: Solution[] = [];
+    public localSolutions: Solution[] = [];
 
     public shouldStop(): boolean {
         return this.evalutionCount >= this.budget;
     }
 
     public addSolution(solution: string) {
-        this.solutions.push(solution);
+        let fitness = this.evaluateString(solution)
+        this.solutions.push({regex: solution, fitness, date: new Date(), count: this.evalutionCount});
+    }
+
+    public addLocalSolution(solution: string) {
+        let fitness = this.evaluateString(solution);
+        this.localSolutions.push({regex: solution, fitness, date: new Date(), count: this.evalutionCount});
     }
 
     public generateInitialIndividual(): Individual {
@@ -135,5 +148,9 @@ export default class Program extends BaseProgram {
 
     public getRandomNeighbor(ind: Individual): Individual {
         return this.factory.generateRandomlyFrom(ind);
+    }
+
+    public getBestSolution(): Solution {
+        return this.solutions.length > 0 ? this.solutions[0] : this.localSolutions[0];
     }
 }
