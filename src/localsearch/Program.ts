@@ -17,7 +17,12 @@ export default class Program extends BaseProgram {
     public localSolutions: Solution[] = [];
 
     public shouldStop(): boolean {
-        return this.evalutionCount >= this.budget;
+        if (this.evalutionCount >= this.budget) {
+            this.endTime = new Date();
+            return true;
+        }
+
+        return false;
     }
 
     public addSolution(solution: string) {

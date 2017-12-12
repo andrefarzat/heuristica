@@ -12,6 +12,8 @@ export default class Program {
     public factory: IndividualFactory;
     public currentBest: Individual = null;
     public evalutionCount: number = 0;
+    public startTime: Date;
+    public endTime: Date;
 
     public get validLeftChars(): string[] {
         return Object.keys(this.chars.left);
@@ -36,6 +38,7 @@ export default class Program {
     }
 
     public init(): void {
+        this.startTime = new Date();
         this.chars.left = this.extractUniqueChars(this.left);
         this.chars.right = this.extractUniqueChars(this.right);
         this.factory = new IndividualFactory(this.validLeftChars, this.validRigthChars);
