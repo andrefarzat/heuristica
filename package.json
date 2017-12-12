@@ -10,7 +10,9 @@
     "genetic": "ts-node --stack-size 10000 src/genetic/index.ts"
   },
   "dependencies": {
+    "@types/args": "^3.0.0",
     "@types/node": "^8.0.34",
+    "args": "^3.0.8",
     "color": "^2.0.1",
     "raw-loader": "^0.5.1",
     "ts-loader": "^2.3.7",

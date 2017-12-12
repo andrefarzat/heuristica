@@ -1,9 +1,20 @@
 const colors = require('colors/safe');
+const args = require('args');
 import Program from "./Program";
 import Utils from "../Utils";
 
 
-const program = new Program('ranges');
+args.option('name', 'O nome da instancia')
+    .option('depth', 'O tamanho do depth (default 5)');
+
+const flags = args.parse(process.argv);
+
+if (!flags.name) {
+    args.showHelp();
+    process.exit();
+}
+
+const program = new Program(flags.name);
 program.init();
 
 
@@ -12,7 +23,7 @@ function log(level: number, message: string) {
     if (level <= LOG_LEVEL) console.log(message);
 }
 
-const DEPTH = 5;
+const DEPTH = flags.depth || 5;
 
 log(1, `[Instance]: ${program.instanceName}`);
 log(1, `[left Phrases]: ${program.left}`);
