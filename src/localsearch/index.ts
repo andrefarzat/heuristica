@@ -3,7 +3,7 @@ import Program from "./Program";
 import Utils from "../Utils";
 
 
-const program = new Program('four');
+const program = new Program('ranges');
 program.init();
 
 
@@ -11,6 +11,8 @@ const LOG_LEVEL = 2;
 function log(level: number, message: string) {
     if (level <= LOG_LEVEL) console.log(message);
 }
+
+const DEPTH = 5;
 
 log(1, `[Instance]: ${program.instanceName}`);
 log(1, `[left Phrases]: ${program.left}`);
@@ -23,7 +25,7 @@ log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
 
 //var ind = program.generateInitialIndividual();
-let ind = program.factory.generateRandom(Utils.nextInt(5));
+let ind = program.factory.generateRandom(DEPTH);
 program.budget = 100000 * 6;
 
 
@@ -73,7 +75,7 @@ do {
         program.localSolutions.push(solution);
 
         // We restart randonlly
-        let ind = program.factory.generateRandom(Utils.nextInt(10));
+        let ind = program.factory.generateRandom(DEPTH);
         solution = ind.toString();
         bestFitness = program.evaluateString(solution);
         log(2, ' ');
