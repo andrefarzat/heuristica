@@ -90,6 +90,15 @@ export default class Program {
         return fitness >= quantity;
     }
 
+    public isValidRegex(str: string): boolean {
+        try {
+            new RegExp(str);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     public evaluateRegex(regex: RegExp): number {
         this.evalutionCount += 1;
         let fitness = 0;

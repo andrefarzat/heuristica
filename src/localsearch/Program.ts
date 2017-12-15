@@ -2,6 +2,7 @@ import BaseProgram from "../BaseProgram";
 import Func from "../nodes/Func";
 import Individual from "../Individual";
 import Terminal from "../nodes/Terminal";
+import Utils from "../Utils";
 
 export interface Solution {
     regex: string;
@@ -70,11 +71,30 @@ export default class Program extends BaseProgram {
         return ind;
     }
 
+    public getNeighborhoodLength(solution: string): number {
+        let ret = 0;
+        let len = solution.length;
+        let chars = this.validLeftChars.length + 4;
+
+        ret += (chars * len) * 2;
+        ret += (chars * len) * 3;
+        ret += ((this.validLeftChars.length * 2) * len) * 2;
+        ret += (this.rightCharsNotInLeft.length) * len;
+        ret += (this.rightCharsNotInLeft.length * 2) * len;
+
+        return ret;
+    }
+
     public * generateNeighborhood(solution: string) {
         let len = solution.length;
         let firstLetter = solution.substr(0, 1);
         let lastLetter  = solution.substr(-1);
         let chars = this.validLeftChars.concat(['', '^', '$', '*']);
+
+        let isValid = (text: string | string[]): boolean => {
+            if (Array.isArray(text)) text = text.join('');
+            return this.isValidRegex(text);
+        };
 
         // Operator: Concatenation
         for(let i = 0; i <= len; i++) {
@@ -86,10 +106,11 @@ export default class Program extends BaseProgram {
                 // Swapping
                 let currentSolution = solution.split('');
                 currentSolution[i] = char;
-                yield currentSolution.join('');
+                if (isValid(currentSolution)) yield currentSolution.join('');
 
                 // Appending
-                yield solution.substr(0, i) + char + solution.substr(i)
+                let anotherSolution = solution.substr(0, i) + char + solution.substr(i)
+                if (isValid(anotherSolution)) yield anotherSolution;
             }
         }
 
@@ -97,9 +118,15 @@ export default class Program extends BaseProgram {
         for(let i = 0; i <= len; i++) {
             for(let j = 0; j < chars.length; j++) {
                 let char = chars[j];
-                yield solution.substr(0, i) + '|' + solution.substr(i);
-                yield solution.substr(0, i) + char + '|' + solution.substr(i);
-                yield solution.substr(0, i) + '|' + char + solution.substr(i);
+
+                let currentSolution = solution.substr(0, i) + '|' + solution.substr(i);
+                if (isValid(currentSolution)) yield currentSolution;
+
+                currentSolution = solution.substr(0, i) + char + '|' + solution.substr(i);
+                if (isValid(currentSolution)) yield currentSolution;
+
+                currentSolution = solution.substr(0, i) + '|' + char + solution.substr(i);
+                if (isValid(currentSolution)) yield currentSolution;
             }
         }
 
@@ -117,8 +144,10 @@ export default class Program extends BaseProgram {
 
                 let currentSolution = solution.split('');
                 currentSolution[i] = range;
-                yield currentSolution.join('');
-                yield solution.substr(0, i) + range + solution.substr(i);
+                if (isValid(currentSolution)) yield currentSolution.join('');
+
+                let anotherSolution = solution.substr(0, i) + range + solution.substr(i);
+                if (isValid(anotherSolution)) yield anotherSolution;
             }
         }
 
@@ -126,7 +155,8 @@ export default class Program extends BaseProgram {
         for(let i = 0; i <= len; i++) {
             for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
                 let char = '[^'+ this.rightCharsNotInLeft[j] + ']';
-                yield solution.substr(0, i) + char + solution.substr(i);
+                let currentSolution = solution.substr(0, i) + char + solution.substr(i);
+                if (isValid(currentSolution)) yield currentSolution;
             }
         }
 
@@ -138,10 +168,11 @@ export default class Program extends BaseProgram {
                 // Swapping
                 let currentSolution = solution.split('');
                 currentSolution[i] = char;
-                yield currentSolution.join('');
+                if (isValid(currentSolution)) yield currentSolution.join('');
 
                 // Appending
-                yield solution.substr(0, i) + char + solution.substr(i)
+                let anotherSolution = solution.substr(0, i) + char + solution.substr(i)
+                if (isValid(anotherSolution)) yield anotherSolution;
             }
         }
 
@@ -157,5 +188,36 @@ export default class Program extends BaseProgram {
 
     public getBestSolution(): Solution {
         return this.solutions.length > 0 ? this.solutions[0] : this.localSolutions[0];
+    }
+
+    public generateViaILS(solution: string): Individual {
+        let count = 0;
+
+        while (count < 5) {
+            let maxLength = this.getNeighborhoodLength(solution);
+            let index = Utils.nextInt(maxLength);
+
+            let neighborhood = this.generateNeighborhood(solution);
+            let i = 0;
+            let neighbor;
+            while (i < index) {
+                neighbor = neighborhood.next();
+                if (neighbor.done) break;
+                i ++;
+            }
+
+            // There is a chance that we don't get a valid solution
+            // In this case, let's generate one with the same length #shrug
+            if (!this.isValidRegex(neighbor.value)) {
+                let ind = this.factory.generateRandom(neighbor.value.length);
+                neighbor.value = ind.toString();
+            }
+
+            solution = neighbor.value;
+            count ++;
+        }
+
+        let ind = this.factory.createFromString(solution);
+        return ind;
     }
 }

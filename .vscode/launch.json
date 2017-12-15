@@ -10,6 +10,7 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}/src/localsearch/index.ts",
+            "args": ["--name", "books", "--depth", "5"],
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"

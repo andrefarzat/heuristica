@@ -20,7 +20,7 @@ function vai(index: number) {
     program.init();
 
 
-    const LOG_LEVEL = 0;
+    const LOG_LEVEL = 2;
     function log(level: number, message: string) {
         if (level <= LOG_LEVEL) console.log(message);
     }
@@ -87,8 +87,12 @@ function vai(index: number) {
             log(2, colors.yellow(`[Best local is]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
             program.addLocalSolution(solution);
 
-            // We restart randonlly
-            let ind = program.factory.generateRandom(DEPTH);
+            // We restart randonly
+            // let ind = program.factory.generateRandom(DEPTH);
+
+            // We restart using ILS
+            let ind = program.generateViaILS(solution);
+
             solution = ind.toString();
             bestFitness = program.evaluateString(solution);
             log(2, ' ');
