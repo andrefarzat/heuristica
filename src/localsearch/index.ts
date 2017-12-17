@@ -20,7 +20,7 @@ function vai(index: number) {
     program.init();
 
 
-    const LOG_LEVEL = 4;
+    const LOG_LEVEL = 3;
     function log(level: number, message: string) {
         if (level <= LOG_LEVEL) console.log(message);
     }
@@ -38,62 +38,68 @@ function vai(index: number) {
 
 
     // let ind = program.factory.generateRandom(DEPTH);
-    let ind = program.generateInitialIndividual();
+    let currentSolution = program.generateInitialIndividual();
     program.budget = 100000 * 6;
 
-    let solution = ind;
-    let bestFitness = program.evaluate(solution);
     log(1, '');
-    log(1, colors.green(`Initial: ${solution.toString()}`));
+    log(1, colors.green(`Initial: ${currentSolution.toString()}`));
 
     do {
         var hasFoundBetter = false;
 
-        if (program.isBest(solution)) {
-            program.addSolution(solution);
+        if (program.isBest(currentSolution)) {
+            program.addSolution(currentSolution);
         }
 
         if (program.shouldStop()) break;
         log(3, colors.magenta(`[Evaluations ${program.evalutionCount} of ${program.budget}]`));
 
-        let neighborhood = program.generateNeighborhood(solution);
-        let bestNeighbor = null;
+        let neighborhood = program.generateNeighborhood(currentSolution);
         do {
             var neighbor = neighborhood.next();
             if (neighbor.done) break;
             program.evaluate(neighbor.value);
             log(4, `[Neighbor] ${neighbor.value} [fitness] ${neighbor.value.fitness}`);
 
-            if (neighbor.value.fitness > solution.fitness) {
-                solution = neighbor.value;
+            if (neighbor.value.fitness > currentSolution.fitness) {
+                log(3, `[Found better ${neighbor.value}] from fitness ${currentSolution.fitness} to ${neighbor.value.fitness} of ${program.getMaxFitness()} o/`);
+                currentSolution = neighbor.value;
                 hasFoundBetter = true;
-                log(3, `[Found better]: ${neighbor.value} ${neighbor.value.fitness} of ${program.getMaxFitness()} o/`);
             } else {
-                if (neighbor.value.fitness == solution.fitness && solution.toString() != neighbor.value.toString() && neighbor.value.toString().length < solution.toString().length) {
-                    bestNeighbor = neighbor.value;
-                    hasFoundBetter = true;
-                    log(3, `[Found shorter]: ${neighbor.value} ${neighbor.value} of ${program.getMaxFitness()} o/`);
+                let theyAreDiffAndHaveTheSameFitness = neighbor.value.fitness == currentSolution.fitness && currentSolution.toString() != neighbor.value.toString();
+                if (theyAreDiffAndHaveTheSameFitness) {
+                    let newSolutionIsLessen = neighbor.value.toString().length < currentSolution.toString().length;
+                    if (newSolutionIsLessen) {
+                        log(3, `[Found shorter ${neighbor.value.toString()}] from length ${currentSolution.toString().length} to ${neighbor.value.toString().length} o/`);
+                        currentSolution = neighbor.value;
+                        hasFoundBetter = true;
+                        continue;
+                    }
+
+                    let hasBetterLeftFitness = neighbor.value.leftFitness > currentSolution.leftFitness;
+                    if (hasBetterLeftFitness) {
+                        log(3, `[Found better left fitness ${neighbor.value.toString()}] from ${currentSolution.leftFitness} to ${neighbor.value.leftFitness} of ${program.getMaxFitness()} o/`);
+                        currentSolution = neighbor.value;
+                        hasFoundBetter = true;
+                        continue;
+                    }
                 }
             }
         } while(true)
 
-        if (bestNeighbor) {
-            solution = bestNeighbor;
-            continue;
-        }
-
         if (!hasFoundBetter) {
-            log(2, colors.yellow(`[Best local is]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
-            program.addLocalSolution(solution);
+            log(2, colors.yellow(`[Best local is]: ${currentSolution.toString()} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
+            program.addLocalSolution(currentSolution);
 
             // We restart randonly
-            solution = program.factory.generateRandom(DEPTH);
+            currentSolution = program.factory.generateRandom(DEPTH);
+            program.evaluate(currentSolution);
 
             // We restart using ILS
             // solution = program.generateViaILS(solution);
             // bestFitness = program.evaluate(solution);
             log(2, ' ');
-            log(2, colors.green(`[Jumped to]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
+            log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
         }
 
     } while(true);
@@ -102,8 +108,8 @@ function vai(index: number) {
         if (a.ind.fitness > b.ind.fitness) return -1;
         if (a.ind.fitness < b.ind.fitness) return 1;
 
-        if (a.ind.toString().length > b.toString().length) return 1;
-        if (a.ind.toString().length < b.toString().length) return -1;
+        if (a.ind.toString().length > b.ind.toString().length) return 1;
+        if (a.ind.toString().length < b.ind.toString().length) return -1;
 
         return 0;
     };
@@ -117,7 +123,7 @@ function vai(index: number) {
     log(2, `Was found ${program.localSolutions.length} local solution(s)`);
     program.localSolutions.sort(sorter);
     program.localSolutions.forEach(solution => {
-        log(3, `[Local Solution]: ${solution.ind}; [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}]; [Length ${solution.ind.toString().length}]`);
+        log(3, `[Local Solution]: ${solution.ind.toString()} [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}] [Length ${solution.ind.toString().length}]`);
     });
 
     log(3, ' ');
@@ -125,7 +131,7 @@ function vai(index: number) {
 
     program.solutions.sort(sorter);
     program.solutions.forEach((solution, i) => {
-        let txt = `[Solution]: ${solution}; [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}]; [Length ${solution.toString().length}]`;
+        let txt = `[Solution]: ${solution.ind.toString()} [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}] [Length ${solution.ind.toString().length}]`;
         log(1, (i == 0) ? colors.green(txt) : txt);
     });
 

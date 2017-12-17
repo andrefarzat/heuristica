@@ -74,16 +74,6 @@ export default class Program {
         return fitness >= quantity;
     }
 
-    public isBestRegex(regex: RegExp | string): boolean {
-        if (typeof regex == "string") {
-            regex = new RegExp(regex);
-        }
-
-        let fitness = this.evaluateRegex(regex);
-        let quantity = this.left.length + this.right.length;
-        return fitness >= quantity;
-    }
-
     public isValidRegex(str: string): boolean {
         try {
             new RegExp(str);
@@ -93,26 +83,15 @@ export default class Program {
         }
     }
 
-    public evaluateRegex(regex: RegExp): number {
-        this.evalutionCount += 1;
-        let fitness = 0;
-        this.left .forEach(name => fitness += regex.test(name) ? 1 : 0);
-        this.right.forEach(name => fitness += regex.test(name) ? 0 : 1);
-        return fitness;
-    }
-
-    public evaluateString(str: string): number {
-        try {
-            let regex = new RegExp(str);
-            return this.evaluateRegex(regex);
-        } catch(e) {
-            return 0;
-        }
-    }
-
     public evaluate(ind: Individual): number {
+        ind.leftFitness = 0;
+        ind.rightFitness = 0;
+        this.evalutionCount += 1;
         let regex = ind.toRegex();
-        return ind.fitness = this.evaluateRegex(regex);
+
+        this.left .forEach(name => ind.leftFitness  += regex.test(name) ? 1 : 0);
+        this.right.forEach(name => ind.rightFitness += regex.test(name) ? 0 : 1);
+        return ind.fitness;
     }
 
     public getMaxFitness(): number {

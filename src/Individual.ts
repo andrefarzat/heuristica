@@ -5,7 +5,12 @@ import Node from "./nodes/Node";
 
 export default class Individual {
     public tree: Func;
-    public fitness: number;
+    public leftFitness: number = 0;
+    public rightFitness: number = 0;
+
+    public get fitness(): number {
+        return this.leftFitness + this.rightFitness;
+    }
 
     public toString(): string {
         return this.tree.toString();
@@ -35,7 +40,8 @@ export default class Individual {
     public clone(): Individual {
         let ind = new Individual();
         ind.tree = this.tree.clone();
-        ind.fitness = this.fitness;
+        ind.leftFitness = this.leftFitness;
+        ind.rightFitness = this.rightFitness;
         return ind;
     }
 

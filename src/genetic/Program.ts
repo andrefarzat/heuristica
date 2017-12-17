@@ -68,26 +68,6 @@ export default class Program extends BaseProgram {
         return this.generationNumber >= this.maxGenerationNumber;
     }
 
-    // @override
-    public evaluate(ind: Individual): number {
-        let str = ind.toString();
-        if (str.length == 0) {
-            ind.fitness = 0;
-            return;
-        }
-
-        try {
-            let regex = ind.toRegex();
-            ind.fitness = this.evaluateRegex(regex);
-        } catch(e) {
-            // FIXME: Invalid Regex we discard. We should treat this
-            // console.log(e.message);
-            ind.fitness = 0;
-        }
-
-        return ind.fitness;
-    }
-
     public doCrossover(father: Individual, population: Population): Individual {
         let mother = population.getUsingRoullete();
         return this.crossoverOperator.cross(father, mother);
