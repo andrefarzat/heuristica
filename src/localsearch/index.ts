@@ -202,7 +202,7 @@ function vai2(index: number) {
                 hasFoundBetter = true;
                 log(3, `[Found better]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
             } else {
-                if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.length) {
+                if (fitness == bestFitness && solution != neighbor.value && neighbor.value.length < solution.toString().length) {
                     bestNeighbor = neighbor.value;
                     log(3, `[Found shorter]: ${neighbor.value} ${fitness} of ${program.getMaxFitness()} o/`);
                 }
@@ -222,10 +222,8 @@ function vai2(index: number) {
             // let ind = program.factory.generateRandom(DEPTH);
 
             // We restart using ILS
-            let ind = program.generateViaILS(solution);
-
-            solution = ind.toString();
-            bestFitness = program.evaluateString(solution);
+            solution = program.generateViaILS(solution);
+            bestFitness = program.evaluate(solution);
             log(2, ' ');
             log(2, colors.green(`[Jumped to]: ${solution} ${bestFitness} of ${program.getMaxFitness()}`));
         }
@@ -233,11 +231,11 @@ function vai2(index: number) {
     } while(true);
 
     function sorter(a: Solution, b: Solution): number {
-        if (a.fitness > b.fitness) return -1;
-        if (a.fitness < b.fitness) return 1;
+        if (a.ind.fitness > b.ind.fitness) return -1;
+        if (a.ind.fitness < b.ind.fitness) return 1;
 
-        if (a.regex.length > b.regex.length) return 1;
-        if (a.regex.length < b.regex.length) return -1;
+        if (a.ind.toString().length > b.toString().length) return 1;
+        if (a.ind.toString().length < b.toString().length) return -1;
 
         return 0;
     };
@@ -251,7 +249,7 @@ function vai2(index: number) {
     log(2, `Was found ${program.localSolutions.length} local solution(s)`);
     program.localSolutions.sort(sorter);
     program.localSolutions.forEach(solution => {
-        log(3, `[Local Solution]: ${solution.regex}; [Fitness ${solution.fitness} of ${program.getMaxFitness()}]; [Length ${solution.regex.length}]`);
+        log(3, `[Local Solution]: ${solution.ind}; [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}]; [Length ${solution.ind.toString().length}]`);
     });
 
     log(3, ' ');
@@ -259,7 +257,7 @@ function vai2(index: number) {
 
     program.solutions.sort(sorter);
     program.solutions.forEach((solution, i) => {
-        let txt = `[Solution]: ${solution.regex}; [Fitness ${solution.fitness} of ${program.getMaxFitness()}]; [Length ${solution.regex.length}]`;
+        let txt = `[Solution]: ${solution}; [Fitness ${solution.ind.fitness} of ${program.getMaxFitness()}]; [Length ${solution.toString().length}]`;
         log(1, (i == 0) ? colors.green(txt) : txt);
     });
 
@@ -273,10 +271,10 @@ function vai2(index: number) {
         let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
 
         // Nome, Depth, i, Melhor solução, Melhor fitness, Número de comparações, Tempo para encontrar melhor solução, Tempo total
-        let txt = [flags.name, DEPTH, index, bestSolution.regex, bestSolution.fitness, bestSolution.count, time, totalTime].join(',');
+        let txt = [flags.name, DEPTH, index, bestSolution.toString(), bestSolution.ind.fitness, bestSolution.count, time, totalTime].join(',');
         console.log(txt);
     }();
 }
 
 
-for (let ii = 1; ii <= 30; ii++) vai(ii);
+for (let ii = 1; ii <= 30; ii++) vai2(ii);

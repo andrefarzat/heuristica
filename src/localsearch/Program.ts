@@ -122,87 +122,68 @@ export default class Program extends BaseProgram {
             }
         }
 
-        // Aqui
-        let chars = this.validLeftChars.concat(['', '^', '$', '*']);
-
-
-        // Operator: Concatenation
-        for(let i = 0; i <= len; i++) {
-            for(let j = 0; j < chars.length; j++) {
-                let char = chars[j];
-                // if (char == '^' && firstLetter == '^') continue;
-                // if (char == '$' && lastLetter  == '$') continue;
-
-                // Swapping
-                let currentSolution = solution.split('');
-                currentSolution[i] = char;
-                if (isValid(currentSolution)) yield currentSolution.join('');
-
-                // Appending
-                let anotherSolution = solution.substr(0, i) + char + solution.substr(i)
-                if (isValid(anotherSolution)) yield anotherSolution;
-            }
-        }
-
         // Operator: Or
-        for(let i = 0; i <= len; i++) {
-            for(let j = 0; j < chars.length; j++) {
-                let char = chars[j];
+        for (let char of this.validLeftChars) {
+            for (let node of nodes) {
+                for (let side of ['left', 'right']) {
+                    let func = new Func();
+                    func.type = Func.Types.or;
+                    if (side == 'left') {
+                        func.left = node;
+                        func.right = new Terminal(char);
+                    } else {
+                        func.right = node;
+                        func.left = new Terminal(char);
+                    }
 
-                let currentSolution = solution.substr(0, i) + '|' + solution.substr(i);
-                if (isValid(currentSolution)) yield currentSolution;
-
-                currentSolution = solution.substr(0, i) + char + '|' + solution.substr(i);
-                if (isValid(currentSolution)) yield currentSolution;
-
-                currentSolution = solution.substr(0, i) + '|' + char + solution.substr(i);
-                if (isValid(currentSolution)) yield currentSolution;
+                    let neo = this.factory.concatenateToNode(solution, node, func);
+                    if (neo.isValid()) yield neo;
+                }
             }
         }
 
         // Operator: Range
-        let ranges: string[] = [];
-        this.validLeftChars.forEach(c => {
-            this.validLeftChars.forEach(cc => {
-                if (c < cc) ranges.push(`[${c}-${cc}]`)
-            });
-        });
+        let ranges: Terminal[] = [];
+        for (let c1 of this.validLeftChars) {
+            for(let c2 of this.validLeftChars) {
+                if (c1 < c2) {
+                    let terminal = new Terminal(`[${c1}-${c2}]`);
+                    ranges.push(terminal);
+                }
+            }
+        }
 
-        for(let i = 0; i <= len; i++) {
-            for(let j = 0; j < ranges.length; j++) {
-                let range = ranges[j];
+        for (let node of nodes) {
+            for(let range of ranges) {
+                let neo = this.factory.replaceNode(solution, node, range);
+                if (neo.isValid()) yield neo;
 
-                let currentSolution = solution.split('');
-                currentSolution[i] = range;
-                if (isValid(currentSolution)) yield currentSolution.join('');
-
-                let anotherSolution = solution.substr(0, i) + range + solution.substr(i);
-                if (isValid(anotherSolution)) yield anotherSolution;
+                neo = this.factory.concatenateToNode(solution, node, range);
+                if (neo.isValid()) yield neo;
             }
         }
 
         // Operator: Negation
-        for(let i = 0; i <= len; i++) {
-            for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
-                let char = '[^'+ this.rightCharsNotInLeft[j] + ']';
-                let currentSolution = solution.substr(0, i) + char + solution.substr(i);
-                if (isValid(currentSolution)) yield currentSolution;
+        for (let char of this.rightCharsNotInLeft) {
+            let func = new Func();
+            func.type = Func.Types.negation;
+            func.left = new Terminal('');
+            func.right = new Terminal(char);
+
+            for (let node of nodes) {
+                let neo = this.factory.replaceNode(solution, node, func);
+                if (neo.isValid()) yield neo;
+
+                neo = this.factory.concatenateToNode(solution, node, func);
+                if (neo.isValid()) yield neo;
             }
         }
 
         // Operator: Concatenation (but from right chars not in left)
-        for(let i = 0; i <= len; i++) {
-            for(let j = 0; j < this.rightCharsNotInLeft.length; j++) {
-                let char = chars[j];
-
-                // Swapping
-                let currentSolution = solution.split('');
-                currentSolution[i] = char;
-                if (isValid(currentSolution)) yield currentSolution.join('');
-
-                // Appending
-                let anotherSolution = solution.substr(0, i) + char + solution.substr(i)
-                if (isValid(anotherSolution)) yield anotherSolution;
+        for (let char of this.validRigthChars) {
+            for (let node of nodes) {
+                let neo = this.factory.concatenateToNode(solution, node, new Terminal(char));
+                if (neo.isValid()) yield neo;
             }
         }
 
@@ -220,9 +201,8 @@ export default class Program extends BaseProgram {
         return this.solutions.length > 0 ? this.solutions[0] : this.localSolutions[0];
     }
 
-    public generateViaILS(solution: string): Individual {
+    public generateViaILS(ind: Individual): Individual {
         let count = 0;
-        let ind = this.factory.createFromString(solution);
 
         while (count < 5) {
             let neo = this.factory.generateRandomlyFrom(ind);

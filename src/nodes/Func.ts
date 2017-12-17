@@ -11,8 +11,8 @@ enum FuncTypes {
     zeroOrMore = "•*+",
     oneOrMore = "•?+",
     group = "(•)",
+    list = "[•]",
     negation = "[^•]",
-    range = "[•]",
     more = "•++",
 }
 
