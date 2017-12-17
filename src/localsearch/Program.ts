@@ -5,8 +5,7 @@ import Terminal from "../nodes/Terminal";
 import Utils from "../Utils";
 
 export interface Solution {
-    regex: string;
-    fitness: number;
+    ind: Individual;
     date: Date;
     count: number;
 }
@@ -26,14 +25,13 @@ export default class Program extends BaseProgram {
         return false;
     }
 
-    public addSolution(solution: string) {
-        let fitness = this.evaluateString(solution)
-        this.solutions.push({regex: solution, fitness, date: new Date(), count: this.evalutionCount});
+    public addSolution(ind: Individual) {
+        this.solutions.push({ind, date: new Date(), count: this.evalutionCount});
     }
 
-    public addLocalSolution(solution: string) {
-        let fitness = this.evaluateString(solution);
-        this.localSolutions.push({regex: solution, fitness, date: new Date(), count: this.evalutionCount});
+    public addLocalSolution(ind: Individual) {
+        this.evaluate(ind);
+        this.localSolutions.push({ind, date: new Date(), count: this.evalutionCount});
     }
 
     public generateInitialIndividual(): Individual {
@@ -85,21 +83,48 @@ export default class Program extends BaseProgram {
         return ret;
     }
 
-    public * generateNeighborhood(solution: string) {
-        let len = solution.length;
-        let firstLetter = solution.substr(0, 1);
-        let lastLetter  = solution.substr(-1);
+    public * generateNeighborhood(solution: Individual) {
+        let nodes = solution.getNodes();
+        let funcs = solution.getFuncs();
+        let terminals = solution.getTerminals();
+
+        // Removing a node
+        for (let node of nodes) {
+            let neo = this.factory.removeNode(solution, node);
+            if (neo.isValid()) yield neo;
+        }
+
+        // Adding start operator
+        for (let terminal of terminals) {
+            let neo = this.factory.addStartOperatorToTerminal(solution, terminal);
+            if (neo.isValid()) yield neo;
+        }
+
+        // Adding end operator
+        for (let terminal of terminals) {
+            let neo = this.factory.addEndOperatorToTerminal(solution, terminal);
+            if (neo.isValid()) yield neo;
+        }
+
+        // Replacing
+        for (let terminal of terminals) {
+            for (let char of this.validLeftChars) {
+                let neo = this.factory.replaceNode(solution, terminal, new Terminal(char));
+                if (neo.isValid()) yield neo;
+            }
+        }
+
+        // Concatenating
+        for (let char of this.validLeftChars) {
+            for (let node of nodes) {
+                let neo = this.factory.concatenateToNode(solution, node, new Terminal(char));
+                if (neo.isValid()) yield neo;
+            }
+        }
+
+        // Aqui
         let chars = this.validLeftChars.concat(['', '^', '$', '*']);
 
-        let isValid = (text: string | string[]): boolean => {
-            if (Array.isArray(text)) text = text.join('');
-            return this.isValidRegex(text);
-        };
-
-        // Operation: Removing a char
-        for (let i = 0; i <= len; i++) {
-            yield solution.substr(0, i) + solution.substr(i + 1);
-        }
 
         // Operator: Concatenation
         for(let i = 0; i <= len; i++) {

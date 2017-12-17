@@ -19,6 +19,15 @@ export default class Individual {
         return this.tree.toRegex().test(name);
     }
 
+    public isValid(): boolean {
+        try {
+            this.toRegex();
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     public clone(): Individual {
         let ind = new Individual();
         ind.tree = this.tree.clone();

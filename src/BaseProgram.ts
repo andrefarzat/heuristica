@@ -69,15 +69,9 @@ export default class Program {
     }
 
     public isBest(ind: Individual): boolean {
-        this.evaluate(ind);
+        let fitness = this.evaluate(ind);
         let quantity = this.left.length + this.right.length;
-        if (ind.fitness >= quantity) {
-            console.log(`[isBest ${ind.fitness}] ${ind.toString()}`);
-            this.currentBest = ind;
-            return true;
-        } else {
-            return false;
-        }
+        return fitness >= quantity;
     }
 
     public isBestRegex(regex: RegExp | string): boolean {
@@ -116,9 +110,9 @@ export default class Program {
         }
     }
 
-    public evaluate(ind: Individual): void {
+    public evaluate(ind: Individual): number {
         let regex = ind.toRegex();
-        ind.fitness = this.evaluateRegex(regex);
+        return ind.fitness = this.evaluateRegex(regex);
     }
 
     public getMaxFitness(): number {

@@ -3,6 +3,7 @@ import Individual from "./Individual";
 import Node from "./nodes/Node";
 import Terminal from "./nodes/Terminal"
 import Utils from "./Utils";
+import { IncomingHttpHeaders } from "http";
 
 
 export default class IndividualFactory {
@@ -89,6 +90,40 @@ export default class IndividualFactory {
         return newInd;
     }
 
+    public replaceNode(ind: Individual, one: Node, two: Node): Individual {
+        let neo = ind.clone();
+        let oneIndex = ind.getNodes().indexOf(one);
+        let neoOne = neo.getNodes()[oneIndex];
+
+        let parent = neo.getParentOf(neoOne);
+        if (parent.side == 'left') {
+            parent.func.left = two;
+        } else {
+            parent.func.right = two;
+        }
+
+        return neo;
+    }
+
+    public concatenateToNode(ind: Individual, one: Node, two: Node): Individual {
+        let neo = ind.clone();
+        let neoOne = neo.getNodes()[ind.getNodes().indexOf(one)];
+        let parent = neo.getParentOf(neoOne);
+
+        let func = new Func();
+        func.type = Func.Types.concatenation;
+        func.left = neoOne;
+        func.right = two;
+
+        if (parent.side == 'left') {
+            parent.func.left = func;
+        } else {
+            parent.func.right = func;
+        }
+
+        return neo;
+    }
+
     public addStartOperator(ind: Individual): Individual {
         let node = this.getRandomCharFromLeft();
         let newInd = ind.clone();
@@ -107,6 +142,26 @@ export default class IndividualFactory {
         return newInd;
     }
 
+    public addStartOperatorToTerminal(ind: Individual, terminal: Terminal): Individual {
+        let index = ind.getTerminals().indexOf(terminal);
+        let neo = ind.clone();
+        let neoTerminal = neo.getFuncs()[index];
+        let parent = neo.getParentOf(neoTerminal);
+
+        let func = new Func();
+        func.type = Func.Types.lineBegin;
+        func.right = neoTerminal;
+        func.left = new Terminal('');
+
+        if (parent.side == 'left') {
+            parent.func.left = func;
+        } else {
+            parent.func.right = func;
+        }
+
+        return neo;
+    }
+
     public addEndOperator(ind: Individual): Individual {
         let node = this.getRandomCharFromLeft();
         let newInd = ind.clone();
@@ -123,6 +178,26 @@ export default class IndividualFactory {
         }
 
         return newInd;
+    }
+
+    public addEndOperatorToTerminal(ind: Individual, terminal: Terminal): Individual {
+        let index = ind.getTerminals().indexOf(terminal);
+        let neo = ind.clone();
+        let neoTerminal = neo.getFuncs()[index];
+        let parent = neo.getParentOf(neoTerminal);
+
+        let func = new Func();
+        func.type = Func.Types.lineEnd;
+        func.right = neoTerminal;
+        func.left = new Terminal('');
+
+        if (parent.side == 'left') {
+            parent.func.left = func;
+        } else {
+            parent.func.right = func;
+        }
+
+        return neo;
     }
 
     public addToNegation(ind: Individual, node: Node): Individual {
@@ -155,7 +230,7 @@ export default class IndividualFactory {
         return newInd;
     }
 
-    public removeRandomChar(ind: Individual) : Individual {
+    public removeRandomChar(ind: Individual): Individual {
         let newInd = ind.clone();
         let terminal = Utils.getRandomlyFromList(newInd.getTerminals());
         let parent = ind.getParentOf(terminal);
@@ -167,6 +242,21 @@ export default class IndividualFactory {
         }
 
         return newInd;
+    }
+
+    public removeNode(ind: Individual, node: Node): Individual {
+        let neo = ind.clone();
+        let index = ind.getNodes().indexOf(node);
+        let nodeToBeRemoved = neo.getNodes()[index];
+        let parent = neo.getParentOf(nodeToBeRemoved);
+
+        if (parent.side == 'left') {
+            parent.func.left = new Terminal('');
+        } else {
+            parent.func.right = new Terminal('');
+        }
+
+        return neo;
     }
 
     public generateNegationNodeFromList(chars: string[]): Func {
