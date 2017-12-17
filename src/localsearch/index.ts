@@ -20,7 +20,7 @@ function vai(index: number) {
     program.init();
 
 
-    const LOG_LEVEL = 3;
+    const LOG_LEVEL = 0;
     function log(level: number, message: string) {
         if (level <= LOG_LEVEL) console.log(message);
     }
@@ -37,8 +37,8 @@ function vai(index: number) {
     log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
 
-    // let ind = program.factory.generateRandom(DEPTH);
-    let currentSolution = program.generateInitialIndividual();
+    let currentSolution = program.factory.generateRandom(DEPTH);
+    // let currentSolution = program.generateInitialIndividual();
     program.budget = 100000 * 6;
 
     log(1, '');
@@ -92,12 +92,13 @@ function vai(index: number) {
             program.addLocalSolution(currentSolution);
 
             // We restart randonly
-            currentSolution = program.factory.generateRandom(DEPTH);
-            program.evaluate(currentSolution);
+            // currentSolution = program.factory.generateRandom(DEPTH);
+            // program.evaluate(currentSolution);
 
             // We restart using ILS
-            // solution = program.generateViaILS(solution);
-            // bestFitness = program.evaluate(solution);
+            currentSolution = program.generateViaILS(currentSolution);
+            program.evaluate(currentSolution);
+
             log(2, ' ');
             log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
         }
@@ -113,10 +114,6 @@ function vai(index: number) {
 
         return 0;
     };
-
-    // // Local solutions
-    // log(2, ' ');
-    // log(2, `Was found ${program.localSolutions.length} local solution(s)`);
 
     // Solutions
     log(1, ' ');
@@ -145,7 +142,7 @@ function vai(index: number) {
         let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
 
         // Nome, Depth, i, Melhor solução, Melhor fitness, Número de comparações, Tempo para encontrar melhor solução, Tempo total
-        let txt = [flags.name, DEPTH, index, bestSolution.toString(), bestSolution.ind.fitness, bestSolution.count, time, totalTime].join(',');
+        let txt = [flags.name, DEPTH, index, bestSolution.ind.toString(), bestSolution.ind.fitness, bestSolution.count, time, totalTime].join(',');
         console.log(txt);
     }();
 }

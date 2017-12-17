@@ -218,6 +218,7 @@ export default class Program extends BaseProgram {
 
         while (count < 5) {
             let neo = this.factory.generateRandomlyFrom(ind);
+            if (!neo.isValid()) continue;
             if (!this.isValidRegex(neo.toString())) continue;
 
             ind = neo;
