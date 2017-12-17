@@ -69,7 +69,7 @@ export default class Program extends BaseProgram {
     }
 
     // @override
-    public evaluate(ind: Individual): void {
+    public evaluate(ind: Individual): number {
         let str = ind.toString();
         if (str.length == 0) {
             ind.fitness = 0;
@@ -84,6 +84,8 @@ export default class Program extends BaseProgram {
             // console.log(e.message);
             ind.fitness = 0;
         }
+
+        return ind.fitness;
     }
 
     public doCrossover(father: Individual, population: Population): Individual {
@@ -92,7 +94,7 @@ export default class Program extends BaseProgram {
     }
 
     public doMutation(father: Individual): Individual {
-        let chars = this.validLeftChars.concat(this.validRigthChars);
+        let chars = this.validLeftChars.concat(this.validRightChars);
         return this.mutationOperator.mutate(father, chars);
     }
 

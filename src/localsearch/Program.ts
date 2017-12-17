@@ -97,12 +97,14 @@ export default class Program extends BaseProgram {
         // Adding start operator
         for (let terminal of terminals) {
             let neo = this.factory.addStartOperatorToTerminal(solution, terminal);
+            if (terminal.value == '') continue;
             if (neo.isValid()) yield neo;
         }
 
         // Adding end operator
         for (let terminal of terminals) {
             let neo = this.factory.addEndOperatorToTerminal(solution, terminal);
+            if (terminal.value == '') continue;
             if (neo.isValid()) yield neo;
         }
 
@@ -115,28 +117,34 @@ export default class Program extends BaseProgram {
         }
 
         // Concatenating
-        for (let char of this.validLeftChars) {
+        for (let char of this.leftCharsNotInRight) {
             for (let node of nodes) {
                 let neo = this.factory.concatenateToNode(solution, node, new Terminal(char));
                 if (neo.isValid()) yield neo;
             }
         }
 
+        for (let func of funcs) {
+            if (func.type != Func.Types.concatenation) continue;
+            let neo = this.factory.changeFuncType(solution, func, Func.Types.or);
+            if (neo.isValid()) yield neo;
+        }
+
         // Operator: Or
-        for (let char of this.validLeftChars) {
-            for (let node of nodes) {
+        for (let char of this.leftCharsNotInRight) {
+            for (let terminal of terminals) {
+                let func = new Func();
+                func.type = Func.Types.or;
                 for (let side of ['left', 'right']) {
-                    let func = new Func();
-                    func.type = Func.Types.or;
                     if (side == 'left') {
-                        func.left = node;
+                        func.left = terminal;
                         func.right = new Terminal(char);
                     } else {
-                        func.right = node;
                         func.left = new Terminal(char);
+                        func.right = terminal;
                     }
 
-                    let neo = this.factory.concatenateToNode(solution, node, func);
+                    let neo = this.factory.replaceNode(solution, terminal, func);
                     if (neo.isValid()) yield neo;
                 }
             }
@@ -144,10 +152,14 @@ export default class Program extends BaseProgram {
 
         // Operator: Range
         let ranges: Terminal[] = [];
-        for (let c1 of this.validLeftChars) {
-            for(let c2 of this.validLeftChars) {
+        for (let c1 of this.leftCharsNotInRight) {
+            for(let c2 of this.leftCharsNotInRight) {
+                if (c1 == c2) continue;
                 if (c1 < c2) {
                     let terminal = new Terminal(`[${c1}-${c2}]`);
+                    ranges.push(terminal);
+                } else {
+                    let terminal = new Terminal(`[${c2}-${c1}]`);
                     ranges.push(terminal);
                 }
             }
@@ -180,7 +192,7 @@ export default class Program extends BaseProgram {
         }
 
         // Operator: Concatenation (but from right chars not in left)
-        for (let char of this.validRigthChars) {
+        for (let char of this.rightCharsNotInLeft) {
             for (let node of nodes) {
                 let neo = this.factory.concatenateToNode(solution, node, new Terminal(char));
                 if (neo.isValid()) yield neo;
@@ -212,37 +224,6 @@ export default class Program extends BaseProgram {
             count ++;
         }
 
-        return ind;
-    }
-
-    public _generateViaILS(solution: string): Individual {
-        let count = 0;
-
-        while (count < 5) {
-            let maxLength = this.getNeighborhoodLength(solution);
-            let index = Utils.nextInt(maxLength);
-
-            let neighborhood = this.generateNeighborhood(solution);
-            let i = 0;
-            let neighbor;
-            while (i < index) {
-                neighbor = neighborhood.next();
-                if (neighbor.done) break;
-                i ++;
-            }
-
-            // There is a chance that we don't get a valid solution
-            // In this case, let's generate one with the same length #shrug
-            if (!this.isValidRegex(neighbor.value)) {
-                let ind = this.factory.generateRandom(neighbor.value.length);
-                neighbor.value = ind.toString();
-            }
-
-            solution = neighbor.value;
-            count ++;
-        }
-
-        let ind = this.factory.createFromString(solution);
         return ind;
     }
 }

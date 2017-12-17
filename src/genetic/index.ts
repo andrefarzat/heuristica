@@ -12,7 +12,7 @@ program.init();
 var population = program.generateInitialPopulation();
 
 // 2. Avaliar geração
-population.forEach(ind => program.evaluate(ind));
+population.forEach(ind => {program.evaluate(ind);});
 
 do {
 

@@ -19,16 +19,16 @@ export default class Program {
         return Object.keys(this.chars.left);
     }
 
-    public get validRigthChars(): string[] {
+    public get validRightChars(): string[] {
         return Object.keys(this.chars.right);
     }
 
     public get leftCharsNotInRight(): string[] {
-        return this.validLeftChars.filter(char => this.validRigthChars.indexOf(char) === -1);
+        return this.validLeftChars.filter(char => this.validRightChars.indexOf(char) === -1);
     }
 
     public get rightCharsNotInLeft(): string[] {
-        return this.validRigthChars.filter(char => this.validLeftChars.indexOf(char) === -1);
+        return this.validRightChars.filter(char => this.validLeftChars.indexOf(char) === -1);
     }
 
     constructor(public instanceName: string) {
@@ -41,7 +41,7 @@ export default class Program {
         this.startTime = new Date();
         this.chars.left = this.extractUniqueChars(this.left);
         this.chars.right = this.extractUniqueChars(this.right);
-        this.factory = new IndividualFactory(this.validLeftChars, this.validRigthChars);
+        this.factory = new IndividualFactory(this.validLeftChars, this.validRightChars);
     }
 
     public extractUniqueChars(text: string[]): {[key: string]: number} {

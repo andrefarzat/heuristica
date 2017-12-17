@@ -1,4 +1,4 @@
-import Func from "./nodes/Func";
+import Func, {FuncTypes} from "./nodes/Func";
 import Individual from "./Individual";
 import Node from "./nodes/Node";
 import Terminal from "./nodes/Terminal"
@@ -96,7 +96,12 @@ export default class IndividualFactory {
         let neoOne = neo.getNodes()[oneIndex];
 
         let parent = neo.getParentOf(neoOne);
-        if (parent.side == 'left') {
+        if (!parent) {
+            let func = new Func();
+            func.left = new Terminal('');
+            func.right = two;
+            neo.tree = func;
+        } else if (parent.side == 'left') {
             parent.func.left = two;
         } else {
             parent.func.right = two;
@@ -115,12 +120,21 @@ export default class IndividualFactory {
         func.left = neoOne;
         func.right = two;
 
-        if (parent.side == 'left') {
+        if (!parent) {
+            neo.tree = func;
+        } else if (parent.side == 'left') {
             parent.func.left = func;
         } else {
             parent.func.right = func;
         }
 
+        return neo;
+    }
+
+    public changeFuncType(ind: Individual, func: Func, type: FuncTypes): Individual {
+        let neo = ind.clone();
+        let neoFunc = neo.getFuncs()[ind.getFuncs().indexOf(func)];
+        neoFunc.type = type;
         return neo;
     }
 
@@ -145,7 +159,7 @@ export default class IndividualFactory {
     public addStartOperatorToTerminal(ind: Individual, terminal: Terminal): Individual {
         let index = ind.getTerminals().indexOf(terminal);
         let neo = ind.clone();
-        let neoTerminal = neo.getFuncs()[index];
+        let neoTerminal = neo.getTerminals()[index];
         let parent = neo.getParentOf(neoTerminal);
 
         let func = new Func();
@@ -183,7 +197,7 @@ export default class IndividualFactory {
     public addEndOperatorToTerminal(ind: Individual, terminal: Terminal): Individual {
         let index = ind.getTerminals().indexOf(terminal);
         let neo = ind.clone();
-        let neoTerminal = neo.getFuncs()[index];
+        let neoTerminal = neo.getTerminals()[index];
         let parent = neo.getParentOf(neoTerminal);
 
         let func = new Func();
@@ -231,9 +245,9 @@ export default class IndividualFactory {
     }
 
     public removeRandomChar(ind: Individual): Individual {
-        let newInd = ind.clone();
-        let terminal = Utils.getRandomlyFromList(newInd.getTerminals());
-        let parent = ind.getParentOf(terminal);
+        let neo = ind.clone();
+        let terminal = Utils.getRandomlyFromList(neo.getTerminals());
+        let parent = neo.getParentOf(terminal);
 
         if (parent.side == 'left') {
             parent.func.left = new Terminal('');
@@ -241,7 +255,7 @@ export default class IndividualFactory {
             parent.func.right = new Terminal('');
         }
 
-        return newInd;
+        return neo;
     }
 
     public removeNode(ind: Individual, node: Node): Individual {
@@ -249,6 +263,13 @@ export default class IndividualFactory {
         let index = ind.getNodes().indexOf(node);
         let nodeToBeRemoved = neo.getNodes()[index];
         let parent = neo.getParentOf(nodeToBeRemoved);
+
+        if (!parent) {
+            neo.tree = new Func();
+            neo.tree.left = new Terminal('');
+            neo.tree.right = new Terminal('');
+            return neo;
+        }
 
         if (parent.side == 'left') {
             parent.func.left = new Terminal('');

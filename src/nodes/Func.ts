@@ -3,7 +3,7 @@ import Terminal from "./Terminal";
 import Utils from "../Utils";
 
 
-enum FuncTypes {
+export enum FuncTypes {
     concatenation = "•",
     or = "•|•",
     lineBegin = "^•",

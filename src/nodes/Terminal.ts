@@ -12,7 +12,7 @@ export default class Terminal implements Node {
     }
 
     public toString(): string {
-        return this.value.toString();
+        return this.value.toString().replace(/\s/g, '\\s');
     }
 
     public toRegex(): RegExp {

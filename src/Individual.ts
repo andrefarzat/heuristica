@@ -22,10 +22,14 @@ export default class Individual {
     public isValid(): boolean {
         try {
             this.toRegex();
-            return true;
         } catch {
             return false;
         }
+
+        let str = this.toString();
+        if (str.length == 0) return false;
+        if (str.substr(-1) == '|') return false;
+        return true;
     }
 
     public clone(): Individual {
