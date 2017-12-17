@@ -96,6 +96,11 @@ export default class Program extends BaseProgram {
             return this.isValidRegex(text);
         };
 
+        // Operation: Removing a char
+        for (let i = 0; i <= len; i++) {
+            yield solution.substr(0, i) + solution.substr(i + 1);
+        }
+
         // Operator: Concatenation
         for(let i = 0; i <= len; i++) {
             for(let j = 0; j < chars.length; j++) {
@@ -191,6 +196,21 @@ export default class Program extends BaseProgram {
     }
 
     public generateViaILS(solution: string): Individual {
+        let count = 0;
+        let ind = this.factory.createFromString(solution);
+
+        while (count < 5) {
+            let neo = this.factory.generateRandomlyFrom(ind);
+            if (!this.isValidRegex(neo.toString())) continue;
+
+            ind = neo;
+            count ++;
+        }
+
+        return ind;
+    }
+
+    public _generateViaILS(solution: string): Individual {
         let count = 0;
 
         while (count < 5) {

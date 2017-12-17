@@ -155,6 +155,20 @@ export default class IndividualFactory {
         return newInd;
     }
 
+    public removeRandomChar(ind: Individual) : Individual {
+        let newInd = ind.clone();
+        let terminal = Utils.getRandomlyFromList(newInd.getTerminals());
+        let parent = ind.getParentOf(terminal);
+
+        if (parent.side == 'left') {
+            parent.func.left = new Terminal('');
+        } else {
+            parent.func.right = new Terminal('');
+        }
+
+        return newInd;
+    }
+
     public generateNegationNodeFromList(chars: string[]): Func {
         let func = new Func();
         func.type = Func.Types.negation;
@@ -164,22 +178,19 @@ export default class IndividualFactory {
     }
 
     public generateRandomlyFrom(ind: Individual): Individual {
-        switch (Utils.nextInt(4)) {
-            case 0: return this.addStartOperator(ind);
-            case 1: return this.addEndOperator(ind);
-            default: break;
-        }
-
         let node = Utils.nextBoolean()
             ? this.getRandomCharFromLeft()
             : this.getRandomCharFromRight();
 
-        switch (Utils.nextInt(5)) {
+        switch (Utils.nextInt(8)) {
             case 0: return this.appendAtEnd(ind, node);
             case 1: return this.appendAtBeginning(ind, node);
             case 2: return this.insertRandomly(ind, node);
             case 3: return this.swapRandomly(ind, node);
             case 4: return this.addToNegation(ind, node);
+            case 5: return this.addStartOperator(ind);
+            case 6: return this.addEndOperator(ind);
+            case 7: return this.removeRandomChar(ind);
         }
 
         return this.appendAtEnd(ind, node);
