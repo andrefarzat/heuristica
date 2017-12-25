@@ -4,28 +4,46 @@ import * as moment from "moment";
 import Program, {Solution} from "./Program";
 import Utils from "../Utils";
 
+interface Args {
+    name: string;
+    depth: number;
+    csv: boolean;
+    logLevel: number;
+    index: number;
+    timeout: number;
+}
+
 
 args.option('name', 'O nome da instancia')
-    .option('depth', 'O tamanho do depth (default 5)');
+    .option('depth', 'O tamanho do depth', 5)
+    .option('csv', 'Resultado em csv', false)
+    .option('log-level', "Log level entre 1 e 5", 3)
+    .option('index', 'O índice da execução', 1)
+    .option('timeout', "Timeout em miliseconds", 1000 * 60 * 2);
 
-const flags = args.parse(process.argv);
+const flags: Args = args.parse(process.argv);
 
 if (!flags.name) {
     args.showHelp();
     process.exit();
 }
 
-function vai(index: number) {
+function vai() {
+    const DEPTH = flags.depth;
+    const LOG_LEVEL = flags.csv ? 0 : flags.logLevel;
+    const NAME = flags.name;
+    const INDEX = flags.index;
+    const TIMEOUT = flags.timeout;
+
+    const maxTimeout = moment().add(TIMEOUT, 'milliseconds');
+    let hasTimedOut: boolean = false;
+
     const program = new Program(flags.name);
     program.init();
 
-
-    const LOG_LEVEL = 3;
     function log(level: number, message: string) {
         if (level <= LOG_LEVEL) console.log(message);
     }
-
-    const DEPTH = flags.depth || 5;
 
     log(1, `[Instance]: ${program.instanceName}`);
     log(1, `[left Phrases]: ${program.left}`);
@@ -45,6 +63,11 @@ function vai(index: number) {
     log(1, colors.green(`Initial: ${currentSolution.toString()}`));
 
     do {
+        if (maxTimeout.diff(new Date()) < 0) {
+            hasTimedOut = true;
+        }
+
+        if (hasTimedOut) break;
         var hasFoundBetter = false;
 
         if (program.isBest(currentSolution)) {
@@ -134,23 +157,25 @@ function vai(index: number) {
 
 
 
-    if (LOG_LEVEL > 0) process.exit();
+    if (flags.csv === false) process.exit();
 
     !function() {
         let bestSolution = program.getBestSolution();
         if (!bestSolution) {
             let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
-            let txt = [flags.name, DEPTH, index, 'N/A', 0, 0, totalTime, totalTime].join(',');
+            let txt = [flags.name, DEPTH, INDEX, 'N/A', 0, 0, totalTime, totalTime, hasTimedOut].join(',');
+            console.log(txt);
             return;
         }
         let time = moment(bestSolution.date).diff(program.startTime, 'milliseconds');
         let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
 
-        // Nome, Depth, i, Melhor solução, Melhor fitness, Número de comparações, Tempo para encontrar melhor solução, Tempo total
-        let txt = [flags.name, DEPTH, index, bestSolution.ind.toString(), bestSolution.ind.fitness, bestSolution.count, time, totalTime].join(',');
+        // Nome, Depth, i, Melhor solução, Melhor fitness, Número de comparações, Tempo para encontrar melhor solução, Tempo total, Timed out
+        let txt = [flags.name, DEPTH, INDEX, bestSolution.ind.toString(), bestSolution.ind.fitness, bestSolution.count, time, totalTime, hasTimedOut].join(',');
         console.log(txt);
     }();
 }
 
 
-for (let ii = 1; ii <= 30; ii++) vai(ii);
+// for (let ii = 1; ii <= 30; ii++) vai(ii);
+vai();

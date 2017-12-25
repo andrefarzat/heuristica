@@ -2,10 +2,12 @@
 
 for instance in abba order four "aman-aplan" triples ranges words
 do
-    for depth in {5..15}
+    for depth in {5..15} # depth
     do
-        echo run localsearch -- --name $instance --depth $depth # >> ~/Desktop/resultados.csv
-        npm run localsearch -- --name $instance --depth $depth >> ~/Desktop/resultados_ILS.csv
+        for index in {1..30}
+        do
+            echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+            npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_ILS.csv
+        done
     done
 done
-
