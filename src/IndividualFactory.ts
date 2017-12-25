@@ -258,6 +258,12 @@ export default class IndividualFactory {
         return neo;
     }
 
+    public removeRandomNode(ind: Individual): Individual {
+        let node = Utils.getRandomlyFromList(ind.getNodes());
+
+        return this.removeNode(ind, node);
+    }
+
     public removeNode(ind: Individual, node: Node): Individual {
         let neo = ind.clone();
         let index = ind.getNodes().indexOf(node);

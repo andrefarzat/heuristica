@@ -5,7 +5,7 @@ do
     for depth in {5..15}
     do
         echo run localsearch -- --name $instance --depth $depth # >> ~/Desktop/resultados.csv
-        npm run localsearch -- --name $instance --depth $depth >> ~/Desktop/resultados.csv
+        npm run localsearch -- --name $instance --depth $depth >> ~/Desktop/resultados_ILS.csv
     done
 done
 

@@ -214,15 +214,31 @@ export default class Program extends BaseProgram {
     }
 
     public generateViaILS(ind: Individual): Individual {
-        let count = 0;
+        let count = 5;
 
-        while (count < 5) {
+        while (--count > 0) {
             let neo = this.factory.generateRandomlyFrom(ind);
             if (!neo.isValid()) continue;
             if (!this.isValidRegex(neo.toString())) continue;
 
             ind = neo;
-            count ++;
+        }
+
+        let len = ind.getNodes().length;
+        if (len > 5) {
+            count = 3;
+        } else if (len > 2) {
+            count = 1;
+        } else {
+            count = 0;
+        }
+
+        while (--count > 0) {
+            let neo = this.factory.removeRandomNode(ind);
+            if (!neo.isValid()) continue;
+            if (!this.isValidRegex(neo.toString())) continue;
+
+            ind = neo;
         }
 
         return ind;

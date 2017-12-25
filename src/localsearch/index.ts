@@ -20,7 +20,7 @@ function vai(index: number) {
     program.init();
 
 
-    const LOG_LEVEL = 0;
+    const LOG_LEVEL = 3;
     function log(level: number, message: string) {
         if (level <= LOG_LEVEL) console.log(message);
     }
@@ -138,6 +138,11 @@ function vai(index: number) {
 
     !function() {
         let bestSolution = program.getBestSolution();
+        if (!bestSolution) {
+            let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
+            let txt = [flags.name, DEPTH, index, 'N/A', 0, 0, totalTime, totalTime].join(',');
+            return;
+        }
         let time = moment(bestSolution.date).diff(program.startTime, 'milliseconds');
         let totalTime = moment(program.endTime).diff(program.startTime, 'milliseconds');
 
