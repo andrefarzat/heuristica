@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# instances="abba order four 'aman-aplan' triples ranges words"
+
 for instance in abba order four "aman-aplan" triples ranges words
 do
     for depth in {5..15} # depth

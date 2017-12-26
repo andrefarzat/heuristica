@@ -19,7 +19,7 @@ args.option('name', 'O nome da instancia')
     .option('csv', 'Resultado em csv', false)
     .option('log-level', "Log level entre 1 e 5", 3)
     .option('index', 'O índice da execução', 1)
-    .option('timeout', "Timeout em miliseconds", 1000 * 60 * 2);
+    .option('timeout', "Timeout em miliseconds", 1000 * 60);
 
 const flags: Args = args.parse(process.argv);
 
