@@ -2,14 +2,22 @@
 
 # instances="abba order four 'aman-aplan' triples ranges words"
 
-for instance in abba order four "aman-aplan" triples ranges words
+# for instance in "abba"
+# do
+#     for depth in {14..15} # depth
+#     do
+#         for index in {1..30}
+#         do
+#             echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+#             npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_$instance.csv
+#         done
+#     done
+# done
+
+instance=words
+depth=15
+for index in {1..30}
 do
-    for depth in {5..15} # depth
-    do
-        for index in {1..30}
-        do
-            echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
-            npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_ILS.csv
-        done
-    done
+    echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+    npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_1_$depth_$instance.csv
 done

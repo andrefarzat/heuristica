@@ -29,6 +29,7 @@ if (!flags.name) {
 }
 
 function vai() {
+    debugger;
     const DEPTH = flags.depth;
     const LOG_LEVEL = flags.csv ? 0 : flags.logLevel;
     const NAME = flags.name;
@@ -115,12 +116,12 @@ function vai() {
             program.addLocalSolution(currentSolution);
 
             // We restart randonly
-            // currentSolution = program.factory.generateRandom(DEPTH);
-            // program.evaluate(currentSolution);
+            currentSolution = program.factory.generateRandom(DEPTH);
+            program.evaluate(currentSolution);
 
             // We restart using ILS
-            currentSolution = program.generateViaILS(currentSolution);
-            program.evaluate(currentSolution);
+            // currentSolution = program.generateViaILS(currentSolution);
+            // program.evaluate(currentSolution);
 
             log(2, ' ');
             log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
