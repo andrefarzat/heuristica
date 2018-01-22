@@ -1,6 +1,7 @@
 import Func from "./nodes/Func";
 import Terminal from "./nodes/Terminal";
 import Node from "./nodes/Node";
+import Logger from './Logger';
 
 
 export default class Individual {
@@ -71,5 +72,42 @@ export default class Individual {
 
     public getTerminals(): Terminal[] {
         return this.tree.getTerminals();
+    }
+
+    public isBetterThan(ind: Individual): boolean {
+        if (this.fitness > ind.fitness) {
+            Logger.log(3, `[Found better ${this.toString()}] from fitness ${ind.fitness} to ${this.fitness}`);
+            return true;
+        }
+
+        if (this.fitness == ind.fitness) {
+            if (this.toString().length < this.toString().length) {
+                Logger.log(3, `[Found shorter ${this.toString()}] from length ${ind.toString().length} to ${this.toString().length}`);
+                return true;
+            }
+
+            if (this.leftFitness > ind.leftFitness) {
+                Logger.log(3, `[Found better left fitness ${this.toString()}] from ${ind.leftFitness} to ${this.leftFitness}`);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public shrink(): Individual {
+        let ind = new Individual();
+        let node = this.tree.shrink();
+
+        if (node.nodeType === 'terminal') {
+            let func = new Func();
+            func.type = Func.Types.concatenation;
+            func.left = new Terminal('');
+            func.right = node;
+            node = func;
+        }
+
+        ind.tree = node as Func;
+        return ind;
     }
 }
