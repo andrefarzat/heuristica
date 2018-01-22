@@ -1,4 +1,4 @@
-import Node from "./Node";
+import Node, {NodeTypes} from "./Node";
 import Terminal from "./Terminal";
 import Utils from "../Utils";
 
@@ -30,6 +30,11 @@ export default class Func implements Node {
     public left: Node;
     public right: Node;
     public type: FuncTypes = Func.placeholder;
+    public readonly nodeType = NodeTypes.func;
+
+    public constructor(type?: FuncTypes) {
+        if (type) this.type = type;
+    }
 
     public mutate(values: string[]): void {
         this.type = Utils.getRandomlyFromList(Func.options);
@@ -110,5 +115,145 @@ export default class Func implements Node {
             if (node instanceof Func) nodes.push(node);
         });
         return nodes;
+    }
+
+    public shrink(): Node {
+        if (this.type == Func.Types.concatenation) {
+            let left = this.left.shrink();
+            let right = this.right.shrink();
+
+            let areBothTerminal = left.nodeType == 'terminal'
+                && right.nodeType == 'terminal';
+
+            if (areBothTerminal) {
+                return new Terminal(left.toString() + right.toString());
+            }
+
+            let func = new Func(FuncTypes.concatenation);
+            func.left = left;
+            func.right = right;
+            return func;
+        }
+
+        if (this.type == Func.Types.lineBegin) {
+            let func = this.clone();
+            // We search for all lineBegin and remove them.
+            // There must be only ONE lineBegin
+            func.getFuncs().forEach(func => {
+                if (func.type == Func.Types.lineBegin) {
+                    func.type = Func.Types.concatenation;
+                }
+            });
+
+            let neo = new Func(Func.Types.lineBegin);
+            neo.left = new Terminal();
+            neo.right = func;
+            return neo;
+        }
+
+        if (this.type == Func.Types.lineEnd) {
+            let func = this.clone();
+            // We search for all lineEnd and remove them.
+            // There must be only ONE lineEnd
+            func.getFuncs().forEach(func => {
+                if (func.type == Func.Types.lineEnd) {
+                    func.type = Func.Types.concatenation;
+                }
+            });
+
+            let neo = new Func(Func.Types.lineEnd);
+            neo.left = new Terminal();
+            neo.right = func;
+            return neo;
+        }
+
+        if (this.type == Func.Types.list) {
+            let func = this.clone();
+
+            func.getFuncs().forEach(func => {
+                if (func.type == Func.Types.list) {
+                    func.type = Func.Types.concatenation;
+                }
+            });
+
+            let left = this.left.shrink();
+            let right = this.right.shrink();
+
+            let areBothTerminal = left.nodeType == NodeTypes.terminal
+                && right.nodeType == NodeTypes.terminal;
+
+            if (areBothTerminal) {
+                let str = Utils.getUniqueChars(left.toString() + right.toString());
+                let func = new Func(Func.Types.list);
+                func.left = new Terminal();
+                func.right = new Terminal(str);
+                return func;
+            } else if (left.nodeType == NodeTypes.terminal) {
+                let str = Utils.getUniqueChars(left.toString());
+                let func = new Func(Func.Types.list);
+                func.left = new Terminal(str);
+                func.right = right;
+                return func;
+            } else {
+                let str = Utils.getUniqueChars(right.toString());
+                let func = new Func(Func.Types.list);
+                func.left = left;
+                func.right = new Terminal(str);
+                return func;
+            }
+        }
+
+        if (this.type == Func.Types.negation) {
+            let func = this.clone();
+
+            func.getFuncs().forEach(func => {
+                if (func.type == Func.Types.negation) {
+                    func.type = Func.Types.concatenation;
+                }
+            });
+
+            let left = this.left.shrink();
+            let right = this.right.shrink();
+
+            let areBothTerminal = left.nodeType == NodeTypes.terminal
+                && right.nodeType == NodeTypes.terminal;
+
+            if (areBothTerminal) {
+                let str = Utils.getUniqueChars(left.toString() + right.toString());
+                let func = new Func(Func.Types.negation);
+                func.left = new Terminal();
+                func.right = new Terminal(str);
+                return func;
+            } else if (left.nodeType == NodeTypes.terminal) {
+                let str = Utils.getUniqueChars(left.toString());
+                let func = new Func(Func.Types.negation);
+                func.left = new Terminal(str);
+                func.right = right;
+                return func;
+            } else {
+                let str = Utils.getUniqueChars(right.toString());
+                let func = new Func(Func.Types.negation);
+                func.left = left;
+                func.right = new Terminal(str);
+                return func;
+            }
+        }
+
+        if (this.type == Func.Types.or) {
+            let func = new Func(Func.Types.or);
+            func.left = this.left.shrink();
+            func.right = this.right.shrink();
+            return func;
+        }
+
+        // or = "•|•",
+        // zeroOrMore = "•*+",
+        // oneOrMore = "•?+",
+        // group = "(•)",
+        // more = "•++",
+        let func = new Func(this.type);
+        func.left = this.left.shrink();
+        func.right = this.right.shrink();
+        return func;
     }
 }

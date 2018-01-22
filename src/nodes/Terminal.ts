@@ -1,4 +1,4 @@
-import Node from "./Node";
+import Node, {NodeTypes} from "./Node";
 import Utils from "../Utils";
 
 
@@ -6,6 +6,8 @@ export default class Terminal implements Node {
     constructor(public value: string = '') {
         // pass
     }
+
+    public readonly nodeType = NodeTypes.terminal;
 
     public mutate(values: string[]): void {
         this.value = Utils.getRandomlyFromList(values);
@@ -22,5 +24,9 @@ export default class Terminal implements Node {
     public clone(): Terminal {
         let terminal = new Terminal(this.value);
         return terminal;
+    }
+
+    public shrink(): Terminal {
+        return this.clone();
     }
 }

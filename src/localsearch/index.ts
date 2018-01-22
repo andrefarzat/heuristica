@@ -3,6 +3,7 @@ const args = require('args');
 import * as moment from "moment";
 import Program, {Solution} from "./Program";
 import Utils from "../Utils";
+import Logger from "../Logger";
 
 interface Args {
     name: string;
@@ -30,10 +31,10 @@ if (!flags.name) {
 
 function vai() {
     const DEPTH = flags.depth;
-    const LOG_LEVEL = flags.csv ? 0 : flags.logLevel;
     const NAME = flags.name;
     const INDEX = flags.index;
     const TIMEOUT = flags.timeout;
+    Logger.setLogLevel(flags.csv ? 0 : flags.logLevel);
 
     const maxTimeout = moment().add(TIMEOUT, 'milliseconds');
     let hasTimedOut: boolean = false;
@@ -42,7 +43,7 @@ function vai() {
     program.init();
 
     function log(level: number, message: string) {
-        if (level <= LOG_LEVEL) console.log(message);
+        return Logger.log(level, message);
     }
 
     log(1, `[Instance]: ${program.instanceName}`);
@@ -54,7 +55,7 @@ function vai() {
     log(1, `[left Chars Not In Right]: ${program.leftCharsNotInRight}`);
     log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
-
+    debugger;
     let currentSolution = program.factory.generateRandom(DEPTH);
     // let currentSolution = program.generateInitialIndividual();
     program.budget = 100000 * 6;
@@ -84,29 +85,9 @@ function vai() {
             program.evaluate(neighbor.value);
             log(4, `[Neighbor] ${neighbor.value} [fitness] ${neighbor.value.fitness}`);
 
-            if (neighbor.value.fitness > currentSolution.fitness) {
-                log(3, `[Found better ${neighbor.value}] from fitness ${currentSolution.fitness} to ${neighbor.value.fitness} of ${program.getMaxFitness()} o/`);
+            if (neighbor.value.isBetterThan(currentSolution)) {
                 currentSolution = neighbor.value;
                 hasFoundBetter = true;
-            } else {
-                let theyAreDiffAndHaveTheSameFitness = neighbor.value.fitness == currentSolution.fitness && currentSolution.toString() != neighbor.value.toString();
-                if (theyAreDiffAndHaveTheSameFitness) {
-                    let newSolutionIsLessen = neighbor.value.toString().length < currentSolution.toString().length;
-                    if (newSolutionIsLessen) {
-                        log(3, `[Found shorter ${neighbor.value.toString()}] from length ${currentSolution.toString().length} to ${neighbor.value.toString().length} o/`);
-                        currentSolution = neighbor.value;
-                        hasFoundBetter = true;
-                        continue;
-                    }
-
-                    let hasBetterLeftFitness = neighbor.value.leftFitness > currentSolution.leftFitness;
-                    if (hasBetterLeftFitness) {
-                        log(3, `[Found better left fitness ${neighbor.value.toString()}] from ${currentSolution.leftFitness} to ${neighbor.value.leftFitness} of ${program.getMaxFitness()} o/`);
-                        currentSolution = neighbor.value;
-                        hasFoundBetter = true;
-                        continue;
-                    }
-                }
             }
         } while(true)
 
@@ -114,16 +95,28 @@ function vai() {
             log(2, colors.yellow(`[Best local is]: ${currentSolution.toString()} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
             program.addLocalSolution(currentSolution);
 
-            // We restart randonly
-            currentSolution = program.factory.generateRandom(DEPTH);
-            program.evaluate(currentSolution);
-
-            // We restart using ILS
-            // currentSolution = program.generateViaILS(currentSolution);
-            // program.evaluate(currentSolution);
+            // We try to shrink our currentSolution
+            let shunkCurrentSolution = currentSolution.shrink();
+            program.evaluate(shunkCurrentSolution);
 
             log(2, ' ');
-            log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
+            if (shunkCurrentSolution.isBetterThan(currentSolution)) {
+                let from = currentSolution.toString().length;
+                let to = shunkCurrentSolution.toString().length;
+                currentSolution = shunkCurrentSolution;
+
+                log(2, `[Shrunk from size ${from} to ${to}`);
+            } else {
+                // We restart randonly
+                // currentSolution = program.factory.generateRandom(DEPTH);
+                // program.evaluate(currentSolution);
+
+                // We restart using ILS
+                currentSolution = program.generateViaILS(currentSolution);
+                program.evaluate(currentSolution);
+                log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
+            }
+
         }
 
     } while(true);

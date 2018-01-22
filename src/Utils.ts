@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+import Func from "./nodes/Func";
+import Node from "./nodes/Node";
 
 
 export default class Utils {
@@ -41,5 +43,11 @@ export default class Utils {
         let len = list.length;
         let index = Utils.nextInt(len > 0 ? len - 1 : 0);
         return list[index];
+    }
+
+    static getUniqueChars(str: string): string {
+        let ret: string[] = [];
+        (new Set(str)).forEach(s => ret.push(s));
+        return ret.join('');
     }
 }
