@@ -1,23 +1,30 @@
 #!/bin/bash
 
-# instances="abba order four 'aman-aplan' triples ranges words"
+# instances="abba order"
+# instances="four 'aman-aplan'"
+# instances="triples ranges"
+# instances="words anchors"
 
-# for instance in "abba"
-# do
-#     for depth in {14..15} # depth
-#     do
-#         for index in {1..30}
-#         do
-#             echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
-#             npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_$instance.csv
-#         done
-#     done
-# done
+instances="abba order four 'aman-aplan' triples ranges words anchors"
 
-instance=words
-depth=15
-for index in {1..30}
+for instance in $instances
 do
-    echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
-    npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_1_$depth_$instance.csv
+    for depth in {1..15} # depth
+    do
+        for index in {1..30}
+        do
+            echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+            npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_$instance.csv
+        done
+    done
 done
+
+
+
+# instance=words
+# depth=15
+# for index in {1..30}
+# do
+#     echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+#     npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> ~/Desktop/resultados_1_$depth_$instance.csv
+# done

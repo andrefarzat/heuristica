@@ -29,7 +29,6 @@ if (!flags.name) {
 }
 
 function vai() {
-    debugger;
     const DEPTH = flags.depth;
     const LOG_LEVEL = flags.csv ? 0 : flags.logLevel;
     const NAME = flags.name;
