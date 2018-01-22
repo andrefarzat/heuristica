@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # instances="abba order"
-# instances="four 'aman-aplan'"
+# instances="four aman-aplan"
 # instances="triples ranges"
 # instances="words anchors"
 
-instances="abba order four 'aman-aplan' triples ranges words anchors"
+instances="abba order four aman-aplan triples ranges words anchors"
 
 for instance in $instances
 do
