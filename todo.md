@@ -8,3 +8,4 @@
 * [ ] Programar a semente geradora dos números aleatórios
     * [ ] Rodas cada rodada (das 30) com a mesma semente
 * [ ] Ver de ver a maquina na UNIRIO
+* [ ] Enviar nome do ep do Black Mirror
