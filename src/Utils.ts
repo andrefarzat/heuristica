@@ -3,8 +3,14 @@ import * as path from "path";
 import Func from "./nodes/Func";
 import Node from "./nodes/Node";
 
+import MersenneTwister = require("mersenne-twister");
+
+const SEED = 1234567890;
+
 
 export default class Utils {
+    static random = new MersenneTwister(SEED);
+
     static loadInstance(instanceName: string): {left: string[], right: string[]} {
         let pathToLeftFile  = path.join(__dirname, '..', 'instances', instanceName, 'left.txt');
         let pathToRightFile = path.join(__dirname, '..', 'instances', instanceName, 'right.txt');
@@ -21,7 +27,7 @@ export default class Utils {
     }
 
     static nextInt(max: number = 10): number {
-        return Math.round(Math.random() * max);
+        return Math.round(this.random.random() * max);
     }
 
     static nextBoolean(): boolean {
