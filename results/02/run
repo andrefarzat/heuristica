@@ -1,0 +1,17 @@
+#!/bin/bash
+
+instances="abba aman-aplan anchors four ranges order triples words"
+
+depth=9
+
+DIRECTORY=`dirname $0`
+FILE="$DIRECTORY/abba_ILS.csv"
+
+for instance in $instances
+do
+    for index in {1..30}
+    do
+        echo npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv
+        npm run localsearch -- --name=$instance --depth=$depth --index=$index --csv >> $FILE
+    done
+done

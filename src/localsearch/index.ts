@@ -55,7 +55,6 @@ function vai() {
     log(1, `[left Chars Not In Right]: ${program.leftCharsNotInRight}`);
     log(1, `[right Chars Not In Left]: ${program.rightCharsNotInLeft}`);
 
-    debugger;
     let currentSolution = program.factory.generateRandom(DEPTH);
     // let currentSolution = program.generateInitialIndividual();
     program.budget = 100000 * 6;
@@ -95,27 +94,32 @@ function vai() {
             log(2, colors.yellow(`[Best local is]: ${currentSolution.toString()} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
             program.addLocalSolution(currentSolution);
 
-            // We try to shrink our currentSolution
-            let shunkCurrentSolution = currentSolution.shrink();
-            program.evaluate(shunkCurrentSolution);
+            // // We try to shrink our currentSolution
+            // let shunkCurrentSolution = currentSolution.shrink();
+            // program.evaluate(shunkCurrentSolution);
 
-            log(2, ' ');
-            if (shunkCurrentSolution.isBetterThan(currentSolution)) {
-                let from = currentSolution.toString().length;
-                let to = shunkCurrentSolution.toString().length;
-                currentSolution = shunkCurrentSolution;
+            // We restart using ILS
+            currentSolution = program.generateViaILS(currentSolution);
+            program.evaluate(currentSolution);
+            log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
 
-                log(2, `[Shrunk from size ${from} to ${to}`);
-            } else {
-                // We restart randonly
-                // currentSolution = program.factory.generateRandom(DEPTH);
-                // program.evaluate(currentSolution);
+            // log(2, ' ');
+            // if (shunkCurrentSolution.isBetterThan(currentSolution)) {
+            //     let from = currentSolution.toString().length;
+            //     let to = shunkCurrentSolution.toString().length;
+            //     currentSolution = shunkCurrentSolution;
 
-                // We restart using ILS
-                currentSolution = program.generateViaILS(currentSolution);
-                program.evaluate(currentSolution);
-                log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
-            }
+            //     log(2, `[Shrunk from size ${from} to ${to}`);
+            // } else {
+            //     // We restart randonly
+            //     // currentSolution = program.factory.generateRandom(DEPTH);
+            //     // program.evaluate(currentSolution);
+
+            //     // We restart using ILS
+            //     currentSolution = program.generateViaILS(currentSolution);
+            //     program.evaluate(currentSolution);
+            //     log(2, colors.green(`[Jumped to]: ${currentSolution} ${currentSolution.fitness} of ${program.getMaxFitness()}`));
+            // }
 
         }
 
