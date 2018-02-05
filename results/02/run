@@ -1,6 +1,6 @@
 #!/bin/bash
 
-instances="abba aman-aplan anchors four ranges order triples words"
+instances="abba aman-aplan anchors four order ranges triples words"
 
 depth=9
 
